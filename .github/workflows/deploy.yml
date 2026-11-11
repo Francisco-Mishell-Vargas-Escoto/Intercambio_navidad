@@ -53,7 +53,57 @@ jobs:
           '
           php -l config/config.local.php
 
-      - name: Subir archivos por FTP a htdocs/
+      # El FTP gratuito a veces no responde: se intenta hasta 3 veces
+      - name: Subir archivos por FTP a htdocs/ (intento 1)
+        id: ftp1
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ env.FTP_SERVER }}
+          username: ${{ env.FTP_USUARIO }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: htdocs/
+          timeout: 120000          # el FTP gratuito a veces tarda en responder (ms)
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            tests/**
+            docs/**
+            database/**
+            README.md
+
+      - name: Esperar antes de reintentar
+        if: steps.ftp1.outcome == 'failure'
+        run: sleep 45
+
+      - name: Subir archivos por FTP a htdocs/ (intento 2)
+        id: ftp2
+        if: steps.ftp1.outcome == 'failure'
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ env.FTP_SERVER }}
+          username: ${{ env.FTP_USUARIO }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: htdocs/
+          timeout: 120000          # el FTP gratuito a veces tarda en responder (ms)
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            tests/**
+            docs/**
+            database/**
+            README.md
+
+      - name: Esperar antes de reintentar
+        if: steps.ftp1.outcome == 'failure' && steps.ftp2.outcome == 'failure'
+        run: sleep 45
+
+      - name: Subir archivos por FTP a htdocs/ (intento 3)
+        id: ftp3
+        if: steps.ftp1.outcome == 'failure' && steps.ftp2.outcome == 'failure'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ env.FTP_SERVER }}
