@@ -96,6 +96,7 @@ C:\xampp\php\php.exe tests\ejecutar_todas.php
 - [ ] Generar código nuevo → el enlace anterior dice "no es válido".
 - [ ] Configuración: cambiar el presupuesto y ver el cambio en la página del intercambio.
 - [ ] Tras guardar, el panel vuelve a abrir la misma pestaña.
+- [ ] Configuración → Zona de peligro: con un nombre distinto no borra; con el nombre exacto borra el intercambio y todos sus datos y regresa a "Mis intercambios".
 
 ### 3.6 Sorteo
 - [ ] La restricción Luis ↔ Sofía aparece en la pestaña Sorteo.

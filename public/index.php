@@ -63,6 +63,7 @@ $router->get('/intercambios/{id}/admin', 'AdminController@panel');
 $router->post('/intercambios/{id}/admin/configuracion', 'AdminController@guardarConfiguracion');
 $router->post('/intercambios/{id}/admin/registro', 'AdminController@cambiarRegistro');
 $router->post('/intercambios/{id}/admin/codigo', 'AdminController@regenerarCodigo');
+$router->post('/intercambios/{id}/admin/eliminar', 'AdminController@eliminarIntercambio');
 $router->post('/intercambios/{id}/admin/participantes', 'AdminController@agregarParticipante');
 $router->get('/intercambios/{id}/admin/participantes/{pid}', 'AdminController@editarParticipante');
 $router->post('/intercambios/{id}/admin/participantes/{pid}', 'AdminController@actualizarParticipante');

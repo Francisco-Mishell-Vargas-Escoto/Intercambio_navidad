@@ -173,6 +173,28 @@ class Intercambio
         return $e;
     }
 
+    /** Archivos subidos que pertenecen al intercambio (fotos de participantes y de deseos). */
+    public function archivosDe(int $id): array
+    {
+        $sql = 'SELECT foto AS archivo FROM participantes WHERE intercambio_id = ? AND foto IS NOT NULL
+                UNION ALL
+                SELECT d.imagen FROM deseos d JOIN participantes p ON p.id = d.participante_id
+                WHERE p.intercambio_id = ? AND d.imagen IS NOT NULL';
+        $st = $this->db->prepare($sql);
+        $st->execute([$id, $id]);
+        return $st->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Borra el intercambio. Por las llaves foráneas (ON DELETE CASCADE) se borran también
+     * participantes, deseos, restricciones, asignaciones, invitaciones y notificaciones.
+     */
+    public function eliminar(int $id): void
+    {
+        $st = $this->db->prepare('DELETE FROM intercambios WHERE id = ?');
+        $st->execute([$id]);
+    }
+
     /** ¿Todavía se aceptan registros? Abierto y sin pasar la fecha límite. */
     public static function registroAbierto(array $i): bool
     {

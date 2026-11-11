@@ -283,6 +283,7 @@ a.tarjeta-intercambio:focus-visible { outline: 3px solid var(--dorado); }
     border-radius: 12px;
 }
 .invitacion:hover { border-color: var(--dorado); }
+.zona-peligro { border: 2px solid #f1c2c2; border-radius: var(--radio); background: #fff8f8; }
 
 /* ---------- 8f. Revelación del amigo secreto ---------- */
 .escenario-revelacion {

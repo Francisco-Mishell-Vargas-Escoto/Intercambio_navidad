@@ -97,6 +97,32 @@ class AdminController extends Controller
         redirigir('intercambios/' . $i['id'] . '/admin#invitaciones');
     }
 
+    /**
+     * POST /intercambios/{id}/admin/eliminar  — borra el intercambio COMPLETO (definitivo).
+     * Para evitar accidentes, hay que escribir el nombre exacto del intercambio.
+     */
+    public function eliminarIntercambio(string $id): void
+    {
+        $i = $this->cargarComoAdmin((int)$id);
+        Csrf::verificar();
+
+        $escrito = trim((string)($_POST['confirmar_nombre'] ?? ''));
+        if (mb_strtolower($escrito) !== mb_strtolower(trim($i['nombre']))) {
+            $this->regresarConErrores('intercambios/' . $i['id'] . '/admin#configuracion',
+                ['confirmar_nombre' => 'El nombre no coincide. Escribe exactamente "' . $i['nombre'] . '" para confirmar.'], []);
+        }
+
+        $modelo = new Intercambio();
+        $archivos = $modelo->archivosDe((int)$i['id']);   // se leen ANTES de borrar los registros
+        $modelo->eliminar((int)$i['id']);
+        foreach ($archivos as $archivo) {
+            UploadService::borrar($archivo);
+        }
+
+        flash('info', 'Eliminaste el intercambio "' . $i['nombre'] . '" y todos sus datos.');
+        redirigir('mis-intercambios');
+    }
+
     /* ===================== PARTICIPANTES ===================== */
 
     /**

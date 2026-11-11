@@ -461,6 +461,32 @@ $base = $esquema . '://' . $_SERVER['HTTP_HOST'];
                     <button type="submit" class="btn btn-navidad btn-lg"><i class="bi bi-save"></i> Guardar configuración</button>
                 </div>
             </form>
+
+            <!-- Zona de peligro: eliminar el intercambio -->
+            <div class="card zona-peligro mt-5">
+                <div class="card-body p-4">
+                    <h2 class="h5 text-danger"><i class="bi bi-exclamation-octagon"></i> Zona de peligro</h2>
+                    <p class="mb-1"><strong>Eliminar este intercambio</strong></p>
+                    <p class="small text-muted">Se borran para siempre el intercambio, sus <?= (int)$stats['participantes'] ?> participante(s),
+                        listas de deseos, fotos, restricciones, el sorteo, invitaciones y notificaciones. <strong>No se puede deshacer.</strong></p>
+                    <form method="post" action="<?= url('intercambios/' . (int)$i['id'] . '/admin/eliminar') ?>" class="needs-validation" novalidate
+                          data-confirmar="¿Eliminar «<?= e($i['nombre']) ?>» y TODOS sus datos? Esta acción es definitiva.">
+                        <?= Csrf::campo() ?>
+                        <label for="confirmar_nombre" class="form-label small">Para confirmar, escribe el nombre del intercambio:
+                            <strong><?= e($i['nombre']) ?></strong></label>
+                        <div class="row g-2">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control<?= clase_error('confirmar_nombre') ?>" id="confirmar_nombre"
+                                       name="confirmar_nombre" required autocomplete="off" data-igual-texto="<?= e($i['nombre']) ?>">
+                                <div class="invalid-feedback"><?= e(error_campo('confirmar_nombre')) ?: 'Escribe el nombre exacto del intercambio.' ?></div>
+                            </div>
+                            <div class="col-md-4 d-grid">
+                                <button type="submit" class="btn btn-danger" data-una-vez><i class="bi bi-trash"></i> Eliminar intercambio</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </section>

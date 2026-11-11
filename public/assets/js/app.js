@@ -18,6 +18,16 @@ document.querySelectorAll('form.needs-validation').forEach(function (form) {
     }
     form.addEventListener('input', revisarIguales);
 
+    // Campos que deben coincidir con un texto (ej. escribir el nombre para confirmar un borrado)
+    form.querySelectorAll('[data-igual-texto]').forEach(function (campo) {
+        function revisar() {
+            const igual = campo.value.trim().toLowerCase() === campo.dataset.igualTexto.trim().toLowerCase();
+            campo.setCustomValidity(igual ? '' : 'No coincide');
+        }
+        campo.addEventListener('input', revisar);
+        revisar();
+    });
+
     // Al escribir, quitamos el rojo que puso el servidor
     form.querySelectorAll('.is-invalid').forEach(function (campo) {
         campo.addEventListener('input', function () { campo.classList.remove('is-invalid'); }, { once: true });
@@ -30,8 +40,9 @@ document.querySelectorAll('form.needs-validation').forEach(function (form) {
             evento.stopPropagation();
             const primero = form.querySelector(':invalid');
             if (primero) primero.focus();
-        } else {
+        } else if (!form.dataset.confirmar || form.dataset.confirmado === '1') {
             // Evita doble clic: deshabilita el botón mientras se envía
+            // (si el formulario pide confirmación, se deshabilita hasta que el usuario acepte)
             const boton = form.querySelector('[type="submit"]');
             if (boton) { boton.disabled = true; boton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Enviando…'; }
         }
@@ -135,6 +146,8 @@ document.querySelectorAll('form[data-confirmar]').forEach(function (form) {
     form.addEventListener('submit', function (evento) {
         if (form.dataset.confirmado === '1') return;   // ya aceptó
         evento.preventDefault();
+        // Si además tiene validación y hay errores, no preguntamos nada: primero que corrija
+        if (form.classList.contains('needs-validation') && !form.checkValidity()) return;
         confirmarAccion(form.dataset.confirmar, function () {
             form.dataset.confirmado = '1';
             // Botones data-una-vez: se desactivan para que no se pueda enviar dos veces
