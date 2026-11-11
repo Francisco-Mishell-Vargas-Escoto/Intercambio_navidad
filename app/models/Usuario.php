@@ -43,6 +43,18 @@ class Usuario
         return (int)$this->db->lastInsertId();
     }
 
+    /**
+     * Cambia el nombre de la cuenta y también el de sus participaciones
+     * (así se ve igual como organizador y como participante).
+     */
+    public function actualizarNombre(int $id, string $nombre): void
+    {
+        $st = $this->db->prepare('UPDATE usuarios SET nombre = ? WHERE id = ?');
+        $st->execute([$nombre, $id]);
+        $st = $this->db->prepare('UPDATE participantes SET nombre = ? WHERE usuario_id = ?');
+        $st->execute([$nombre, $id]);
+    }
+
     /** Cambia la foto de perfil (nombre del archivo en public/uploads o null). */
     public function actualizarFoto(int $id, ?string $foto): void
     {

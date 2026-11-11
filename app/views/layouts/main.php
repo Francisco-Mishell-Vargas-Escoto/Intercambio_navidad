@@ -80,6 +80,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><span class="dropdown-item-text small text-muted"><?= e($yo['email']) ?></span></li>
+                            <li><a class="dropdown-item" href="<?= url('mi-cuenta') ?>"><i class="bi bi-person-gear"></i> Mi cuenta</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <!-- Cerrar sesión es un formulario POST con token CSRF -->

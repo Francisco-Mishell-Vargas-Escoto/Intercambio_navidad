@@ -35,6 +35,8 @@ $router->get('/login', 'AuthController@mostrarLogin');
 $router->post('/login', 'AuthController@login');
 $router->post('/logout', 'AuthController@logout');
 $router->get('/mis-intercambios', 'PanelController@index');
+$router->get('/mi-cuenta', 'CuentaController@ver');
+$router->post('/mi-cuenta', 'CuentaController@guardar');
 
 // Módulo 3: intercambios
 $router->get('/intercambios/crear', 'IntercambioController@crear');
