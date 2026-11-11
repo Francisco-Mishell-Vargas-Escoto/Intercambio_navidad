@@ -16,12 +16,12 @@ class Restriccion
     /** Lista con los nombres de ambas personas (para el panel). */
     public function listar(int $intercambioId): array
     {
-        $sql = 'SELECT r.*, ud.nombre AS dador_nombre, ur.nombre AS receptor_nombre
+        $sql = 'SELECT r.*, pd.nombre AS dador_nombre, pr.nombre AS receptor_nombre
                 FROM restricciones r
-                JOIN participantes pd ON pd.id = r.dador_id    JOIN usuarios ud ON ud.id = pd.usuario_id
-                JOIN participantes pr ON pr.id = r.receptor_id JOIN usuarios ur ON ur.id = pr.usuario_id
+                JOIN participantes pd ON pd.id = r.dador_id
+                JOIN participantes pr ON pr.id = r.receptor_id
                 WHERE r.intercambio_id = ?
-                ORDER BY ud.nombre, ur.nombre';
+                ORDER BY pd.nombre, pr.nombre';
         $st = $this->db->prepare($sql);
         $st->execute([$intercambioId]);
         return $st->fetchAll();

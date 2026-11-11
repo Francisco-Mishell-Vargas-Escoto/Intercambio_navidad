@@ -12,12 +12,14 @@ require_once RUTA_APP . '/core/helpers.php';
 require_once RUTA_APP . '/core/Router.php';
 require_once RUTA_APP . '/core/Auth.php';
 require_once RUTA_APP . '/core/Csrf.php';
+require_once RUTA_APP . '/core/Migraciones.php';
 
 // 2) Sesión segura (la cookie no es accesible desde JavaScript)
 ini_set('session.cookie_httponly', '1');
 ini_set('session.use_strict_mode', '1');
 session_start();
 Auth::revisarInactividad(120);   // cierra la sesión tras 2 horas sin actividad
+Migraciones::ejecutar(Database::conectar());   // aplica cambios pendientes de la base de datos (normalmente no hace nada)
 
 // 3) Definición de rutas (se irán agregando en cada módulo)
 $router = new Router();
@@ -42,6 +44,8 @@ $router->get('/unirse', 'IntercambioController@formularioUnirse');
 $router->post('/unirse', 'IntercambioController@buscarCodigo');
 $router->get('/unirse/{codigo}', 'IntercambioController@confirmarUnirse');
 $router->post('/unirse/{codigo}', 'IntercambioController@unirse');
+$router->get('/p/{token}', 'IntercambioController@enlacePersonal');          // enlace personal del participante
+$router->post('/intercambios/{id}/salir', 'IntercambioController@olvidarDispositivo');
 
 // Módulo 4: perfil, confirmación y lista de deseos
 $router->get('/intercambios/{id}/perfil', 'ParticipanteController@perfil');
@@ -61,6 +65,7 @@ $router->post('/intercambios/{id}/admin/participantes', 'AdminController@agregar
 $router->get('/intercambios/{id}/admin/participantes/{pid}', 'AdminController@editarParticipante');
 $router->post('/intercambios/{id}/admin/participantes/{pid}', 'AdminController@actualizarParticipante');
 $router->post('/intercambios/{id}/admin/participantes/{pid}/eliminar', 'AdminController@eliminarParticipante');
+$router->post('/intercambios/{id}/admin/participantes/{pid}/enlace', 'AdminController@regenerarEnlace');
 $router->post('/intercambios/{id}/admin/invitaciones', 'AdminController@crearInvitacion');
 $router->post('/intercambios/{id}/admin/invitaciones/{inv}/eliminar', 'AdminController@eliminarInvitacion');
 $router->get('/invitacion/{token}', 'InvitacionController@ver');

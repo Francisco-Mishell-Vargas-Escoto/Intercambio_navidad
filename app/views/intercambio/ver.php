@@ -2,7 +2,7 @@
 /**
  * Archivo: app/views/intercambio/ver.php
  * Página principal de un intercambio: datos, cuenta regresiva, participantes y compartir.
- * Variables: $i, $esAdmin, $participante, $participantes, $enlace
+ * Variables: $i, $esAdmin, $participante, $enlacePersonal, $misDeseos, $participantes, $enlace
  */
 [$estadoTexto, $estadoColor] = estado_intercambio($i);
 $codigoBonito = CodigoService::formatear($i['codigo_acceso']);
@@ -97,7 +97,14 @@ $textoCompartir = '¡Únete a mi intercambio navideño "' . $i['nombre'] . '"! C
                 </div>
             <?php endif; ?>
 
-            <!-- Amigo secreto (se activa en los módulos 6 y 7) -->
+            <!-- Enlace personal (se resalta justo después de unirse) -->
+            <?php if ($participante):
+                $destacar = (int)($_SESSION['recien_unido'] ?? 0) === (int)$i['id'];
+                unset($_SESSION['recien_unido']);
+                require RUTA_VISTAS . '/participante/_enlace-personal.php';
+            endif; ?>
+
+            <!-- Amigo secreto -->
             <?php if ($participante): ?>
                 <div class="card tarjeta-intercambio tarjeta-secreto mb-4">
                     <div class="card-body p-4 d-flex align-items-center gap-3">

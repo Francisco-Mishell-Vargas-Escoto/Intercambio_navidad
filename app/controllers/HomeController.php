@@ -6,18 +6,32 @@
 
 require_once RUTA_APP . '/core/Controller.php';
 require_once RUTA_APP . '/models/Intercambio.php';
+require_once RUTA_APP . '/core/Participacion.php';
 
 class HomeController extends Controller
 {
     /** GET /  → página principal */
     public function index(): void
     {
-        // Si hay sesión, mostramos el próximo intercambio real del usuario
-        $proximo = Auth::check() ? (new Intercambio())->proximoDeUsuario(Auth::id()) : null;
+        $modelo = new Intercambio();
+        $proximo = Auth::check() ? $modelo->proximoDeUsuario(Auth::id()) : null;
+
+        // Intercambios en los que participa ESTE navegador (enlace personal guardado), con o sin cuenta
+        $enDispositivo = [];
+        foreach (Participacion::delDispositivo() as $p) {
+            $i = $modelo->buscarPorId((int)$p['intercambio_id']);
+            if ($i) {
+                $enDispositivo[] = $i;
+                if (!$proximo && strtotime($i['fecha_evento']) >= time()) {
+                    $proximo = $i;   // sin cuenta: el próximo intercambio de este navegador
+                }
+            }
+        }
 
         $this->vista('home/index', [
-            'titulo'  => 'Inicio',
-            'proximo' => $proximo,
+            'titulo'        => 'Inicio',
+            'proximo'       => $proximo,
+            'enDispositivo' => $enDispositivo,
         ]);
     }
 

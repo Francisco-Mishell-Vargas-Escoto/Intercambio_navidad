@@ -20,7 +20,7 @@ $bloqueado = in_array($i['estado'], ['sorteado', 'revelado'], true);
                 <?php endif; ?>
                 <div>
                     <h1 class="h4 mb-0"><?= e($p['nombre']) ?></h1>
-                    <p class="text-muted mb-0 small"><?= e($p['email']) ?> · se unió el <?= e(fecha_corta($p['creado_en'])) ?></p>
+                    <p class="text-muted mb-0 small"><?= e($p['email'] ?: 'Sin correo') ?> · se unió el <?= e(fecha_corta($p['creado_en'])) ?></p>
                 </div>
             </div>
 
@@ -37,6 +37,7 @@ $bloqueado = in_array($i['estado'], ['sorteado', 'revelado'], true);
 
                     <?php
                     $campos = [
+                        ['nombre', 'Nombre'],
                         ['gustos', 'Gustos personales'], ['intereses', 'Intereses y hobbies'],
                         ['no_le_gusta', 'Cosas que no le gustaría recibir'], ['preferencias', 'Preferencias'],
                         ['comentarios', 'Comentarios adicionales'],
@@ -46,8 +47,13 @@ $bloqueado = in_array($i['estado'], ['sorteado', 'revelado'], true);
                     ?>
                         <div class="mb-3">
                             <label for="<?= $campo ?>" class="form-label"><?= e($etiqueta) ?></label>
-                            <textarea class="form-control<?= clase_error($campo) ?>" id="<?= $campo ?>" name="<?= $campo ?>"
-                                      rows="2" maxlength="1000"><?= $valor ?></textarea>
+                            <?php if ($campo === 'nombre'): ?>
+                                <input type="text" class="form-control<?= clase_error($campo) ?>" id="nombre" name="nombre"
+                                       value="<?= $valor ?>" required minlength="2" maxlength="120">
+                            <?php else: ?>
+                                <textarea class="form-control<?= clase_error($campo) ?>" id="<?= $campo ?>" name="<?= $campo ?>"
+                                          rows="2" maxlength="1000"><?= $valor ?></textarea>
+                            <?php endif; ?>
                             <div class="invalid-feedback"><?= e(error_campo($campo)) ?></div>
                         </div>
                     <?php endforeach; ?>

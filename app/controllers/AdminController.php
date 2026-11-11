@@ -29,6 +29,7 @@ class AdminController extends Controller
     {
         $i = $this->cargarComoAdmin((int)$id);
 
+        require_once RUTA_APP . '/core/Participacion.php';
         $this->vista('admin/panel', [
             'titulo'        => 'Administrar · ' . $i['nombre'],
             'i'             => $i,
@@ -100,8 +101,9 @@ class AdminController extends Controller
 
     /**
      * POST /intercambios/{id}/admin/participantes
-     * Si el correo ya tiene cuenta, se agrega directamente.
-     * Si no, se crea una invitación personal para ese correo.
+     * El organizador agrega a alguien con su nombre (y correo opcional). No necesita cuenta:
+     * se crea su participación con un enlace personal que el organizador le comparte.
+     * Si el correo pertenece a una cuenta registrada, la participación queda vinculada a ella.
      */
     public function agregarParticipante(string $id): void
     {
@@ -115,29 +117,37 @@ class AdminController extends Controller
         }
 
         $v = new Validator($_POST);
-        $v->requerido('email', 'El correo')->email('email')->max('email', 150, 'El correo');
+        $v->requerido('nombre', 'El nombre')->min('nombre', 2, 'El nombre')->max('nombre', 120, 'El nombre')
+          ->email('email')->max('email', 150, 'El correo');
+        $partModelo = new Participante();
+        if (!$v->falla() && $partModelo->existeNombre((int)$i['id'], $v->valor('nombre'))) {
+            $v->error('nombre', 'Ya hay un participante con ese nombre.');
+        }
+
+        $usuario = $v->valor('email') !== '' ? (new Usuario())->buscarPorEmail($v->valor('email')) : null;
+        if (!$v->falla() && $usuario && $partModelo->buscarPorUsuario((int)$i['id'], (int)$usuario['id'])) {
+            $v->error('email', 'La cuenta con ese correo ya participa en este intercambio.');
+        }
         if ($v->falla()) {
-            $this->regresarConErrores($ruta, $v->errores(), ['email']);
+            $this->regresarConErrores($ruta, $v->errores(), ['nombre', 'email']);
         }
 
-        $email = mb_strtolower($v->valor('email'));
-        $usuario = (new Usuario())->buscarPorEmail($email);
+        $p = $partModelo->crear((int)$i['id'], $v->valor('nombre'), $v->valor('email') ?: null,
+                                $usuario ? (int)$usuario['id'] : null);
+        NotificacionService::nuevoParticipante($i, $p, true);
+        flash('success', 'Agregaste a ' . $p['nombre'] . '. Envíale su enlace personal con los botones de la tabla.');
+        redirigir($ruta);
+    }
 
-        if ($usuario) {
-            $partModelo = new Participante();
-            if ($partModelo->buscar((int)$i['id'], (int)$usuario['id'])) {
-                flash('info', $usuario['nombre'] . ' ya participa en este intercambio.');
-            } else {
-                $partModelo->unir((int)$i['id'], (int)$usuario['id']);
-                NotificacionService::nuevoParticipante($i, (int)$usuario['id'], $usuario['nombre'], true);
-                flash('success', 'Agregaste a ' . $usuario['nombre'] . ' al intercambio.');
-            }
-            redirigir($ruta);
-        }
-
-        // No tiene cuenta: creamos (o reutilizamos) una invitación personal
-        $this->crearInvitacionPara($i, $email);
-        redirigir('intercambios/' . $i['id'] . '/admin#invitaciones');
+    /** POST /intercambios/{id}/admin/participantes/{pid}/enlace  — genera un enlace personal nuevo */
+    public function regenerarEnlace(string $id, string $pid): void
+    {
+        $i = $this->cargarComoAdmin((int)$id);
+        Csrf::verificar();
+        $p = $this->cargarParticipante($i, (int)$pid);
+        (new Participante())->regenerarToken((int)$p['id']);
+        flash('success', 'Nuevo enlace personal para ' . $p['nombre'] . '. El anterior ya no funciona; envíale el nuevo.');
+        redirigir('intercambios/' . $i['id'] . '/admin#participantes');
     }
 
     /** GET /intercambios/{id}/admin/participantes/{pid} */
@@ -162,16 +172,21 @@ class AdminController extends Controller
         $p = $this->cargarParticipante($i, (int)$pid);
 
         $v = new Validator($_POST);
+        $v->requerido('nombre', 'El nombre')->min('nombre', 2, 'El nombre')->max('nombre', 120, 'El nombre');
         foreach (['gustos', 'intereses', 'no_le_gusta', 'preferencias', 'comentarios'] as $campo) {
             $v->max($campo, 1000, 'Este campo');
         }
+        if (!$v->falla() && (new Participante())->existeNombre((int)$i['id'], $v->valor('nombre'), (int)$p['id'])) {
+            $v->error('nombre', 'Ya hay otro participante con ese nombre.');
+        }
         $ruta = 'intercambios/' . $i['id'] . '/admin/participantes/' . $p['id'];
         if ($v->falla()) {
-            $this->regresarConErrores($ruta, $v->errores(), ['gustos', 'intereses', 'no_le_gusta', 'preferencias', 'comentarios']);
+            $this->regresarConErrores($ruta, $v->errores(), ['nombre', 'gustos', 'intereses', 'no_le_gusta', 'preferencias', 'comentarios']);
         }
 
         $modelo = new Participante();
         $modelo->actualizarPerfil((int)$p['id'], [
+            'nombre'       => $v->valor('nombre'),
             'gustos'       => $v->valor('gustos') ?: null,
             'intereses'    => $v->valor('intereses') ?: null,
             'no_le_gusta'  => $v->valor('no_le_gusta') ?: null,

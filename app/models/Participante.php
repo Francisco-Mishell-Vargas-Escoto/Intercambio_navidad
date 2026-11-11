@@ -2,6 +2,7 @@
 /**
  * Archivo: app/models/Participante.php
  * Consultas a la tabla `participantes`.
+ * Un participante puede no tener cuenta: se identifica con su token (enlace personal).
  */
 
 class Participante
@@ -13,24 +14,65 @@ class Participante
         $this->db = Database::conectar();
     }
 
-    /** Une a un usuario a un intercambio. Devuelve el ID del participante. */
-    public function unir(int $intercambioId, int $usuarioId): int
+    /**
+     * Crea un participante SIN cuenta (invitado). Devuelve la fila completa.
+     * $usuarioId solo se pasa si la persona tiene cuenta (por ejemplo, el organizador).
+     */
+    public function crear(int $intercambioId, string $nombre, ?string $email, ?int $usuarioId = null): array
     {
-        // INSERT IGNORE: si ya estaba (UNIQUE intercambio+usuario) no truena ni duplica
-        $st = $this->db->prepare('INSERT IGNORE INTO participantes (intercambio_id, usuario_id) VALUES (?, ?)');
-        $st->execute([$intercambioId, $usuarioId]);
-        $p = $this->buscar($intercambioId, $usuarioId);
-        return (int)$p['id'];
+        $token = bin2hex(random_bytes(32));   // 64 caracteres imposibles de adivinar
+        $st = $this->db->prepare('INSERT INTO participantes (intercambio_id, usuario_id, nombre, email, token) VALUES (?, ?, ?, ?, ?)');
+        $st->execute([$intercambioId, $usuarioId, $nombre, $email ? mb_strtolower($email) : null, $token]);
+        return $this->buscarPorToken($token);
     }
 
-    /** Guarda gustos, intereses, lo que no le gusta, preferencias y comentarios. */
+    /** Une a una persona CON cuenta (si ya estaba, devuelve su participación). */
+    public function unirCuenta(int $intercambioId, array $usuario): array
+    {
+        $ya = $this->buscarPorUsuario($intercambioId, (int)$usuario['id']);
+        return $ya ?: $this->crear($intercambioId, $usuario['nombre'], $usuario['email'], (int)$usuario['id']);
+    }
+
+    public function buscarPorToken(string $token): ?array
+    {
+        $st = $this->db->prepare('SELECT * FROM participantes WHERE token = ?');
+        $st->execute([$token]);
+        $fila = $st->fetch();
+        return $fila ?: null;
+    }
+
+    /** Participación de una CUENTA en un intercambio (o null). */
+    public function buscarPorUsuario(int $intercambioId, int $usuarioId): ?array
+    {
+        $st = $this->db->prepare('SELECT * FROM participantes WHERE intercambio_id = ? AND usuario_id = ?');
+        $st->execute([$intercambioId, $usuarioId]);
+        $fila = $st->fetch();
+        return $fila ?: null;
+    }
+
+    /** ¿Ya hay alguien con ese nombre en el intercambio? (evita que alguien se registre dos veces) */
+    public function existeNombre(int $intercambioId, string $nombre, int $exceptoId = 0): bool
+    {
+        $st = $this->db->prepare('SELECT COUNT(*) FROM participantes WHERE intercambio_id = ? AND LOWER(nombre) = LOWER(?) AND id <> ?');
+        $st->execute([$intercambioId, trim($nombre), $exceptoId]);
+        return (int)$st->fetchColumn() > 0;
+    }
+
+    /** Guarda nombre, gustos, intereses, lo que no le gusta, preferencias y comentarios. */
     public function actualizarPerfil(int $participanteId, array $d): void
     {
         $sql = 'UPDATE participantes
-                SET gustos = ?, intereses = ?, no_le_gusta = ?, preferencias = ?, comentarios = ?
+                SET nombre = ?, gustos = ?, intereses = ?, no_le_gusta = ?, preferencias = ?, comentarios = ?
                 WHERE id = ?';
         $st = $this->db->prepare($sql);
-        $st->execute([$d['gustos'], $d['intereses'], $d['no_le_gusta'], $d['preferencias'], $d['comentarios'], $participanteId]);
+        $st->execute([$d['nombre'], $d['gustos'], $d['intereses'], $d['no_le_gusta'], $d['preferencias'], $d['comentarios'], $participanteId]);
+    }
+
+    /** Cambia la foto del participante (archivo en public/uploads o null). */
+    public function actualizarFoto(int $participanteId, ?string $foto): void
+    {
+        $st = $this->db->prepare('UPDATE participantes SET foto = ? WHERE id = ?');
+        $st->execute([$foto, $participanteId]);
     }
 
     /** Marca (1) o desmarca (0) la confirmación de participación. */
@@ -40,15 +82,23 @@ class Participante
         $st->execute([$confirmado ? 1 : 0, $participanteId]);
     }
 
-    /** Lista completa para el panel de administración (incluye correo y número de deseos). */
+    /** Genera un enlace personal nuevo: el anterior deja de funcionar. Devuelve el token nuevo. */
+    public function regenerarToken(int $participanteId): string
+    {
+        $token = bin2hex(random_bytes(32));
+        $st = $this->db->prepare('UPDATE participantes SET token = ? WHERE id = ?');
+        $st->execute([$token, $participanteId]);
+        return $token;
+    }
+
+    /** Lista completa para el panel de administración (incluye número de deseos). */
     public function listarDetalle(int $intercambioId): array
     {
-        $sql = 'SELECT p.*, u.nombre, u.email, u.foto,
+        $sql = 'SELECT p.*,
                        (SELECT COUNT(*) FROM deseos d WHERE d.participante_id = p.id) AS total_deseos
                 FROM participantes p
-                JOIN usuarios u ON u.id = p.usuario_id
                 WHERE p.intercambio_id = ?
-                ORDER BY u.nombre';
+                ORDER BY p.nombre';
         $st = $this->db->prepare($sql);
         $st->execute([$intercambioId]);
         return $st->fetchAll();
@@ -57,10 +107,7 @@ class Participante
     /** Busca un participante por su ID, SOLO dentro del intercambio indicado. */
     public function buscarEnIntercambio(int $participanteId, int $intercambioId): ?array
     {
-        $sql = 'SELECT p.*, u.nombre, u.email, u.foto
-                FROM participantes p JOIN usuarios u ON u.id = p.usuario_id
-                WHERE p.id = ? AND p.intercambio_id = ?';
-        $st = $this->db->prepare($sql);
+        $st = $this->db->prepare('SELECT * FROM participantes WHERE id = ? AND intercambio_id = ?');
         $st->execute([$participanteId, $intercambioId]);
         $fila = $st->fetch();
         return $fila ?: null;
@@ -71,14 +118,5 @@ class Participante
     {
         $st = $this->db->prepare('DELETE FROM participantes WHERE id = ?');
         $st->execute([$participanteId]);
-    }
-
-    /** Fila del participante (o null si el usuario no pertenece al intercambio). */
-    public function buscar(int $intercambioId, int $usuarioId): ?array
-    {
-        $st = $this->db->prepare('SELECT * FROM participantes WHERE intercambio_id = ? AND usuario_id = ?');
-        $st->execute([$intercambioId, $usuarioId]);
-        $fila = $st->fetch();
-        return $fila ?: null;
     }
 }

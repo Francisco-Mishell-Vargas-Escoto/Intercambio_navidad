@@ -7,7 +7,7 @@
 
 require_once RUTA_APP . '/core/Controller.php';
 require_once RUTA_APP . '/core/Validator.php';
-require_once RUTA_APP . '/models/Participante.php';
+require_once RUTA_APP . '/core/Participacion.php';
 require_once RUTA_APP . '/models/Deseo.php';
 require_once RUTA_APP . '/services/UploadService.php';
 
@@ -18,10 +18,9 @@ class DeseoController extends Controller
     /** POST /intercambios/{id}/deseos  — agrega un deseo */
     public function crear(string $id): void
     {
-        Auth::requerir();
         Csrf::verificar();
 
-        $p = (new Participante())->buscar((int)$id, Auth::id());
+        $p = Participacion::actual((int)$id);
         if (!$p) {
             $this->noEncontrado();
         }
@@ -46,7 +45,6 @@ class DeseoController extends Controller
     /** GET /deseos/{id}/editar */
     public function editar(string $id): void
     {
-        Auth::requerir();
         $d = $this->cargar((int)$id);
         $this->vista('participante/editar-deseo', ['titulo' => 'Editar deseo', 'd' => $d]);
     }
@@ -54,7 +52,6 @@ class DeseoController extends Controller
     /** POST /deseos/{id}/editar */
     public function actualizar(string $id): void
     {
-        Auth::requerir();
         Csrf::verificar();
         $d = $this->cargar((int)$id);
 
@@ -74,7 +71,6 @@ class DeseoController extends Controller
     /** POST /deseos/{id}/eliminar */
     public function eliminar(string $id): void
     {
-        Auth::requerir();
         Csrf::verificar();
         $d = $this->cargar((int)$id);
 
@@ -130,10 +126,12 @@ class DeseoController extends Controller
         ], $v];
     }
 
-    /** Carga el deseo solo si es del usuario; si no, 404. */
+    /** Carga el deseo solo si es del participante actual; si no, 404. */
     private function cargar(int $deseoId): array
     {
-        $d = (new Deseo())->buscarDeUsuario($deseoId, Auth::id());
+        $modelo = new Deseo();
+        $p = Participacion::actual($modelo->intercambioDe($deseoId));
+        $d = $p ? $modelo->buscarDeParticipante($deseoId, (int)$p['id']) : null;
         if (!$d) {
             $this->noEncontrado();
         }

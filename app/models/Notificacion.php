@@ -20,11 +20,14 @@ class Notificacion
         $st->execute([$usuarioId, $intercambioId, $tipo, mb_substr($mensaje, 0, 255)]);
     }
 
-    /** Envía el mismo aviso a todos los participantes de un intercambio (menos, opcionalmente, a uno). */
+    /**
+     * Envía el mismo aviso a los participantes CON cuenta de un intercambio (menos, opcionalmente, a uno).
+     * Los participantes sin cuenta ven el estado del intercambio directamente en su página.
+     */
     public function crearParaParticipantes(int $intercambioId, string $tipo, string $mensaje, int $excepto = 0): void
     {
         $sql = 'INSERT INTO notificaciones (usuario_id, intercambio_id, tipo, mensaje)
-                SELECT usuario_id, ?, ?, ? FROM participantes WHERE intercambio_id = ? AND usuario_id <> ?';
+                SELECT usuario_id, ?, ?, ? FROM participantes WHERE intercambio_id = ? AND usuario_id IS NOT NULL AND usuario_id <> ?';
         $st = $this->db->prepare($sql);
         $st->execute([$intercambioId, $tipo, mb_substr($mensaje, 0, 255), $intercambioId, $excepto]);
     }

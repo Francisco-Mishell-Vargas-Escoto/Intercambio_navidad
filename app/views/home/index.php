@@ -98,6 +98,26 @@ if ($proximo) {
     </div>
 </section>
 
+<!-- ===== INTERCAMBIOS DE ESTE DISPOSITIVO (participantes sin cuenta) ===== -->
+<?php if (!Auth::check() && $enDispositivo): ?>
+<section class="container mt-5">
+    <h2 class="h5 text-center mb-3 titulo-seccion">Tus intercambios en este dispositivo</h2>
+    <div class="row g-3 justify-content-center">
+        <?php foreach ($enDispositivo as $d): list($eTexto, $eColor) = estado_intercambio($d); ?>
+            <div class="col-md-6 col-lg-4">
+                <a href="<?= url('intercambios/' . (int)$d['id']) ?>" class="card tarjeta-intercambio h-100 text-decoration-none text-reset">
+                    <div class="card-body p-3">
+                        <span class="badge text-bg-<?= $eColor ?> mb-1"><?= e($eTexto) ?></span>
+                        <h3 class="h6 mb-1"><?= e($d['nombre']) ?></h3>
+                        <p class="small text-muted mb-0"><i class="bi bi-calendar-event"></i> <?= e(fecha_hora($d['fecha_evento'])) ?></p>
+                    </div>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
+
 <!-- ===== MENSAJE NAVIDEÑO ALEATORIO ===== -->
 <section class="container mt-5">
     <div class="mensaje-del-dia text-center mx-auto">

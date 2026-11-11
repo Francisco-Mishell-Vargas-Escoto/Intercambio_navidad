@@ -7,9 +7,13 @@ $preguntas = [
     ['¿Cómo funciona el intercambio?',
      'El organizador crea el intercambio y comparte un código o enlace. Cada persona se une, llena su perfil y su lista de deseos. Cuando todos están listos, el organizador hace el sorteo y publica los resultados. Entonces cada quien descubre a quién le regala.'],
     ['¿Necesito una cuenta?',
-     'Sí. Con tu cuenta puedes unirte a varios intercambios, guardar tu lista de deseos y consultar tu amigo secreto de forma privada. Solo te pedimos nombre, correo y contraseña.'],
+     'Solo si quieres ORGANIZAR un intercambio. Para participar basta con tu nombre: al unirte recibes un enlace personal que funciona como tu llave para volver cuando quieras.'],
     ['¿Cómo me uno a un intercambio?',
-     'Abre el enlace que te enviaron o entra a "Unirme" y escribe el código (por ejemplo NAV-7K2-Q9X). Si no tienes sesión, primero te pedirá entrar o registrarte y después te regresa a la invitación.'],
+     'Abre el enlace que te enviaron o entra a "Unirme" y escribe el código (por ejemplo NAV-7K2-Q9X). Escribe tu nombre y listo: ya estás dentro.'],
+    ['¿Qué es mi enlace personal?',
+     'Es una dirección única (por ejemplo …/p/7f3a…) que te identifica sin contraseña. Tu navegador lo recuerda, pero guárdalo (por ejemplo, envíatelo por WhatsApp) para entrar desde otro dispositivo. No lo compartas: quien lo tenga puede ver a tu amigo secreto.'],
+    ['Perdí mi enlace personal, ¿qué hago?',
+     'Pídele al organizador que te lo reenvíe: él puede copiarlo desde su panel. Si crees que alguien más lo vio, el organizador puede generar uno nuevo y el anterior deja de funcionar.'],
     ['¿El organizador puede ver a quién le tocó cada persona?',
      'No. El sistema solo le muestra cuántas asignaciones existen y cuántas personas ya vieron la suya. Nadie puede ver la lista completa: cada participante consulta únicamente a quién le regala.'],
     ['¿Puede tocarme regalarme a mí mismo?',
@@ -25,7 +29,7 @@ $preguntas = [
     ['¿Por qué no me deja unirme?',
      'Puede ser que ya pasó la fecha límite de registro, que el organizador cerró el registro o que ya se hizo el sorteo. Pide al organizador una invitación personal (funciona mientras no se haya hecho el sorteo).'],
     ['¿Mis datos están seguros?',
-     'Tu contraseña se guarda cifrada (con hash) y nadie puede leerla, ni siquiera el organizador. Tus intercambios solo los ven sus participantes y las fotos se revisan antes de guardarse.'],
+     'Las contraseñas de los organizadores se guardan cifradas (con hash). Tu enlace personal tiene 64 caracteres aleatorios, imposible de adivinar. Cada intercambio solo lo ven sus participantes y las fotos se revisan antes de guardarse.'],
 ];
 ?>
 <section class="container my-5">

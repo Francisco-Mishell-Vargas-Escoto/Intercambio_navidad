@@ -12,6 +12,7 @@
 -- Si vuelves a importar el archivo, primero se borran las tablas
 -- (en orden inverso a sus dependencias para no romper las llaves foráneas)
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS migraciones;
 DROP TABLE IF EXISTS notificaciones;
 DROP TABLE IF EXISTS invitaciones;
 DROP TABLE IF EXISTS asignaciones;
@@ -62,12 +63,19 @@ CREATE TABLE intercambios (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
--- 3. PARTICIPANTES: relación usuario <-> intercambio con su perfil
+-- 3. PARTICIPANTES: personas dentro de un intercambio, con su perfil.
+--    NO necesitan cuenta: entran con su nombre y reciben un enlace
+--    personal secreto (token). usuario_id solo se llena si la persona
+--    tiene cuenta (por ejemplo, el organizador cuando también participa).
 -- ---------------------------------------------------------------------
 CREATE TABLE participantes (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     intercambio_id  INT UNSIGNED NOT NULL,
-    usuario_id      INT UNSIGNED NOT NULL,
+    usuario_id      INT UNSIGNED NULL,           -- opcional: cuenta vinculada
+    nombre          VARCHAR(120) NOT NULL,
+    email           VARCHAR(150) NULL,
+    foto            VARCHAR(255) NULL,           -- archivo en public/uploads
+    token           CHAR(64)     NOT NULL,       -- llave del enlace personal /p/{token}
     gustos          TEXT         NULL,   -- gustos personales
     intereses       TEXT         NULL,   -- intereses / hobbies
     no_le_gusta     TEXT         NULL,   -- cosas que NO le gustaría recibir
@@ -75,7 +83,8 @@ CREATE TABLE participantes (
     comentarios     TEXT         NULL,   -- comentarios adicionales
     confirmado      TINYINT(1)   NOT NULL DEFAULT 0,  -- confirmó su participación
     creado_en       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_participante (intercambio_id, usuario_id), -- nadie se une dos veces
+    UNIQUE KEY uq_participante (intercambio_id, usuario_id), -- una cuenta no se une dos veces
+    UNIQUE KEY uq_participante_token (token),
     CONSTRAINT fk_part_intercambio FOREIGN KEY (intercambio_id)
         REFERENCES intercambios(id) ON DELETE CASCADE,
     CONSTRAINT fk_part_usuario FOREIGN KEY (usuario_id)
@@ -174,3 +183,13 @@ CREATE TABLE notificaciones (
     CONSTRAINT fk_notif_intercambio FOREIGN KEY (intercambio_id)
         REFERENCES intercambios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- 9. MIGRACIONES: cambios de estructura ya aplicados (app/core/Migraciones.php)
+-- ---------------------------------------------------------------------
+CREATE TABLE migraciones (
+    version     INT UNSIGNED PRIMARY KEY,
+    aplicada_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO migraciones (version) VALUES (1);

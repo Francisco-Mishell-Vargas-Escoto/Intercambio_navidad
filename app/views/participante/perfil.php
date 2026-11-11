@@ -2,7 +2,7 @@
 /**
  * Archivo: app/views/participante/perfil.php
  * Perfil del participante: confirmación, foto, gustos y lista de deseos.
- * Variables: $i (intercambio), $p (participante), $deseos, $yo (usuario en sesión)
+ * Variables: $i (intercambio), $p (participante actual), $deseos, $enlacePersonal
  */
 $prioridades = [1 => ['Alta', 'danger'], 2 => ['Media', 'warning'], 3 => ['Baja', 'secondary']];
 $puedeConfirmar = !in_array($i['estado'], ['sorteado', 'revelado'], true);
@@ -41,6 +41,8 @@ $puedeConfirmar = !in_array($i['estado'], ['sorteado', 'revelado'], true);
         </div>
     </div>
 
+    <?php $participante = $p; require RUTA_VISTAS . '/participante/_enlace-personal.php'; ?>
+
     <div class="row g-4">
         <!-- ===== Perfil ===== -->
         <div class="col-lg-5">
@@ -52,10 +54,10 @@ $puedeConfirmar = !in_array($i['estado'], ['sorteado', 'revelado'], true);
 
                     <!-- Foto -->
                     <div class="d-flex align-items-center gap-3 mb-3">
-                        <?php if ($yo['foto']): ?>
-                            <img src="<?= url('uploads/' . e($yo['foto'])) ?>" alt="Tu foto" class="avatar avatar-lg" id="vista-foto">
+                        <?php if ($p['foto']): ?>
+                            <img src="<?= url('uploads/' . e($p['foto'])) ?>" alt="Tu foto" class="avatar avatar-lg" id="vista-foto">
                         <?php else: ?>
-                            <span class="avatar avatar-lg" id="vista-foto-iniciales"><?= e(iniciales($yo['nombre'])) ?></span>
+                            <span class="avatar avatar-lg" id="vista-foto-iniciales"><?= e(iniciales($p['nombre'])) ?></span>
                             <img src="" alt="" class="avatar avatar-lg d-none" id="vista-foto">
                         <?php endif; ?>
                         <div class="flex-grow-1">
@@ -63,13 +65,20 @@ $puedeConfirmar = !in_array($i['estado'], ['sorteado', 'revelado'], true);
                             <input type="file" class="form-control form-control-sm<?= clase_error('foto') ?>" id="foto" name="foto"
                                    accept="image/jpeg,image/png,image/gif,image/webp" data-preview="vista-foto" data-max-mb="2">
                             <div class="invalid-feedback"><?= e(error_campo('foto')) ?: 'La imagen debe pesar máximo 2 MB.' ?></div>
-                            <?php if ($yo['foto']): ?>
+                            <?php if ($p['foto']): ?>
                                 <div class="form-check mt-1">
                                     <input class="form-check-input" type="checkbox" name="quitar_foto" value="1" id="quitar_foto">
                                     <label class="form-check-label small" for="quitar_foto">Quitar mi foto</label>
                                 </div>
                             <?php endif; ?>
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Tu nombre *</label>
+                        <input type="text" class="form-control<?= clase_error('nombre') ?>" id="nombre" name="nombre"
+                               value="<?= old('nombre') !== '' ? old('nombre') : e($p['nombre']) ?>" required minlength="2" maxlength="120">
+                        <div class="invalid-feedback"><?= e(error_campo('nombre')) ?: 'Escribe tu nombre.' ?></div>
                     </div>
 
                     <?php

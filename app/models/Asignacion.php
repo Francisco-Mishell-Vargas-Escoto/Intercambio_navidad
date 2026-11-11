@@ -52,10 +52,9 @@ class Asignacion
      */
     public function deDador(int $intercambioId, int $dadorId): ?array
     {
-        $sql = 'SELECT a.*, u.nombre AS receptor_nombre, u.foto AS receptor_foto
+        $sql = 'SELECT a.*, p.nombre AS receptor_nombre, p.foto AS receptor_foto
                 FROM asignaciones a
                 JOIN participantes p ON p.id = a.receptor_id
-                JOIN usuarios u ON u.id = p.usuario_id
                 WHERE a.intercambio_id = ? AND a.dador_id = ?';
         $st = $this->db->prepare($sql);
         $st->execute([$intercambioId, $dadorId]);

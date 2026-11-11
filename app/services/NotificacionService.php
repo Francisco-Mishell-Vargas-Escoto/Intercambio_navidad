@@ -12,27 +12,32 @@ require_once RUTA_APP . '/models/Notificacion.php';
 
 class NotificacionService
 {
-    /** Alguien se unió (con código, invitación o agregado por el admin). */
-    public static function nuevoParticipante(array $i, int $usuarioId, string $nombre, bool $loAgregoElAdmin = false): void
+    /**
+     * Alguien se unió (con código, invitación o agregado por el admin).
+     * $p = fila del participante. Solo los participantes con cuenta reciben avisos en la campanita.
+     */
+    public static function nuevoParticipante(array $i, array $p, bool $loAgregoElAdmin = false): void
     {
         $n = new Notificacion();
-        if ($loAgregoElAdmin) {
-            $n->crear($usuarioId, (int)$i['id'], 'registro',
-                $i['admin_nombre'] . ' te agregó al intercambio "' . $i['nombre'] . '". ¡Completa tu lista de deseos!');
-            return;
+        $usuarioId = $p['usuario_id'] ? (int)$p['usuario_id'] : 0;
+
+        if ($usuarioId && $usuarioId !== (int)$i['admin_id']) {
+            $n->crear($usuarioId, (int)$i['id'], 'registro', $loAgregoElAdmin
+                ? $i['admin_nombre'] . ' te agregó al intercambio "' . $i['nombre'] . '". ¡Completa tu lista de deseos!'
+                : 'Te uniste a "' . $i['nombre'] . '". ¡Completa tu lista de deseos!');
         }
-        $n->crear($usuarioId, (int)$i['id'], 'registro', 'Te uniste a "' . $i['nombre'] . '". ¡Completa tu lista de deseos!');
-        if ((int)$i['admin_id'] !== $usuarioId) {
-            $n->crear((int)$i['admin_id'], (int)$i['id'], 'registro', $nombre . ' se unió a "' . $i['nombre'] . '".');
+        // Al organizador le avisamos cuando alguien se une por su cuenta (no cuando él lo agregó)
+        if (!$loAgregoElAdmin && $usuarioId !== (int)$i['admin_id']) {
+            $n->crear((int)$i['admin_id'], (int)$i['id'], 'registro', $p['nombre'] . ' se unió a "' . $i['nombre'] . '".');
         }
     }
 
     /** Un participante confirmó o canceló su asistencia: avisamos al organizador. */
-    public static function confirmacion(array $i, int $usuarioId, string $nombre, bool $confirmo): void
+    public static function confirmacion(array $i, array $p, bool $confirmo): void
     {
-        if ((int)$i['admin_id'] === $usuarioId) return;   // no se avisa a sí mismo
+        if ((int)$p['usuario_id'] === (int)$i['admin_id']) return;   // el organizador no se avisa a sí mismo
         (new Notificacion())->crear((int)$i['admin_id'], (int)$i['id'], 'confirmacion',
-            $nombre . ($confirmo ? ' confirmó su participación en "' : ' canceló su confirmación en "') . $i['nombre'] . '".');
+            $p['nombre'] . ($confirmo ? ' confirmó su participación en "' : ' canceló su confirmación en "') . $i['nombre'] . '".');
     }
 
     public static function sorteoRealizado(array $i): void

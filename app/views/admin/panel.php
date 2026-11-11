@@ -128,15 +128,20 @@ $base = $esquema . '://' . $_SERVER['HTTP_HOST'];
                         <form method="post" action="<?= url('intercambios/' . (int)$i['id'] . '/admin/participantes') ?>"
                               class="needs-validation row g-2" novalidate>
                             <?= Csrf::campo() ?>
-                            <div class="col-md-8">
-                                <input type="email" name="email" class="form-control<?= clase_error('email') ?>" required maxlength="150"
-                                       placeholder="correo@ejemplo.com" value="<?= old('email') ?>" aria-label="Correo del participante">
-                                <div class="invalid-feedback"><?= e(error_campo('email')) ?: 'Escribe un correo válido.' ?></div>
+                            <div class="col-md-5">
+                                <input type="text" name="nombre" class="form-control<?= clase_error('nombre') ?>" required minlength="2" maxlength="120"
+                                       placeholder="Nombre, ej. Luis Pérez" value="<?= old('nombre') ?>" aria-label="Nombre del participante">
+                                <div class="invalid-feedback"><?= e(error_campo('nombre')) ?: 'Escribe el nombre.' ?></div>
                             </div>
-                            <div class="col-md-4 d-grid">
+                            <div class="col-md-4">
+                                <input type="email" name="email" class="form-control<?= clase_error('email') ?>" maxlength="150"
+                                       placeholder="Correo (opcional)" value="<?= old('email') ?>" aria-label="Correo del participante">
+                                <div class="invalid-feedback"><?= e(error_campo('email')) ?: 'Escribe un correo válido o déjalo vacío.' ?></div>
+                            </div>
+                            <div class="col-md-3 d-grid">
                                 <button class="btn btn-pino"><i class="bi bi-plus-circle"></i> Agregar</button>
                             </div>
-                            <div class="form-text">Si ya tiene cuenta se agrega al momento. Si no, se crea una invitación personal para ese correo.</div>
+                            <div class="form-text">No necesita cuenta. Después envíale su <strong>enlace personal</strong> con los botones de la tabla.</div>
                         </form>
                     <?php endif; ?>
                 </div>
@@ -166,7 +171,7 @@ $base = $esquema . '://' . $_SERVER['HTTP_HOST'];
                                                 <div class="min-w-0">
                                                     <div class="fw-medium"><?= e($p['nombre']) ?>
                                                         <?php if ((int)$p['usuario_id'] === (int)$i['admin_id']): ?><span class="badge bg-dorado">Tú</span><?php endif; ?></div>
-                                                    <div class="small text-muted text-truncate"><?= e($p['email']) ?></div>
+                                                    <div class="small text-muted text-truncate"><?= e($p['email'] ?: ($p['usuario_id'] ? 'Con cuenta' : 'Sin correo')) ?></div>
                                                 </div>
                                             </div>
                                         </td>
@@ -177,6 +182,24 @@ $base = $esquema . '://' . $_SERVER['HTTP_HOST'];
                                         </td>
                                         <td class="text-center"><?= (int)$p['total_deseos'] ?></td>
                                         <td class="text-end text-nowrap">
+                                            <?php
+                                            $enlaceP = Participacion::enlace($p);
+                                            $textoP = '¡Hola ' . explode(' ', $p['nombre'])[0] . '! Este es tu enlace personal para el intercambio "'
+                                                    . $i['nombre'] . '" (no lo compartas): ' . $enlaceP;
+                                            ?>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-copiar="<?= e($enlaceP) ?>"
+                                                    aria-label="Copiar enlace personal de <?= e($p['nombre']) ?>" title="Copiar enlace personal">
+                                                <i class="bi bi-key"></i></button>
+                                            <a class="btn btn-sm btn-outline-success" target="_blank" rel="noopener" title="Enviar enlace por WhatsApp"
+                                               href="https://wa.me/?text=<?= rawurlencode($textoP) ?>" aria-label="Enviar enlace por WhatsApp">
+                                                <i class="bi bi-whatsapp"></i></a>
+                                            <form method="post" class="d-inline"
+                                                  action="<?= url('intercambios/' . (int)$i['id'] . '/admin/participantes/' . (int)$p['id'] . '/enlace') ?>"
+                                                  data-confirmar="¿Generar un enlace personal nuevo para <?= e($p['nombre']) ?>? El actual dejará de funcionar.">
+                                                <?= Csrf::campo() ?>
+                                                <button class="btn btn-sm btn-outline-secondary" aria-label="Generar enlace nuevo" title="Generar enlace nuevo">
+                                                    <i class="bi bi-arrow-repeat"></i></button>
+                                            </form>
                                             <a href="<?= url('intercambios/' . (int)$i['id'] . '/admin/participantes/' . (int)$p['id']) ?>"
                                                class="btn btn-sm btn-outline-secondary" aria-label="Editar"><i class="bi bi-pencil"></i></a>
                                             <?php if (!$bloqueado): ?>

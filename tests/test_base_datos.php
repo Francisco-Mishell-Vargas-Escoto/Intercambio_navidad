@@ -57,12 +57,17 @@ try {
         "INSERT INTO intercambios (admin_id, nombre, fecha_evento, fecha_limite, codigo_acceso) VALUES (?, 'Otro', NOW(), NOW(), ?)", [$ids[0], $codigo]));
 
     $parts = [];
-    foreach ($ids as $u) {
-        $db->prepare('INSERT INTO participantes (intercambio_id, usuario_id) VALUES (?, ?)')->execute([$intercambio, $u]);
+    $insP = 'INSERT INTO participantes (intercambio_id, usuario_id, nombre, token) VALUES (?, ?, ?, ?)';
+    foreach ($ids as $n => $u) {
+        // Los dos primeros con cuenta; los otros dos SIN cuenta (usuario_id NULL), como invitados
+        $db->prepare($insP)->execute([$intercambio, $n < 2 ? $u : null, "Participante $n", bin2hex(random_bytes(32))]);
         $parts[] = (int)$db->lastInsertId();
     }
-    prueba('Nadie se puede unir dos veces al mismo intercambio', rechaza($db,
-        'INSERT INTO participantes (intercambio_id, usuario_id) VALUES (?, ?)', [$intercambio, $ids[1]]));
+    prueba('Varios participantes SIN cuenta en el mismo intercambio', count($parts) === 4);
+    prueba('Una misma cuenta no se puede unir dos veces al mismo intercambio', rechaza($db, $insP,
+        [$intercambio, $ids[1], 'Repetido', bin2hex(random_bytes(32))]));
+    $tokenUsado = $db->query('SELECT token FROM participantes WHERE id = ' . $parts[3])->fetchColumn();
+    prueba('El enlace personal (token) es único', rechaza($db, $insP, [$intercambio, null, 'Copia', $tokenUsado]));
 
     // --- Sorteo real con el algoritmo y guardado en asignaciones ---
     $resultado = (new SorteoService())->asignar($parts);

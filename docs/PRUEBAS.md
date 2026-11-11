@@ -41,7 +41,7 @@ C:\xampp\php\php.exe tests\ejecutar_todas.php
 |---|---|---|
 | `tests/test_sorteo.php` | Algoritmo: miles de sorteos válidos, restricciones, casos imposibles, aleatoriedad, 200 participantes | 11 |
 | `tests/test_validaciones.php` | Validación de formularios y fechas, presupuesto, códigos, escape XSS, subida de imágenes | 28 |
-| `tests/test_base_datos.php` | Contra tu MySQL: correos y códigos únicos, UNIQUE de asignaciones, bloqueo del sorteo, cascadas, utf8mb4, inyección SQL. **Deshace todo al terminar.** | 12–13 |
+| `tests/test_base_datos.php` | Contra tu MySQL: correos y códigos únicos, participantes sin cuenta, tokens únicos, UNIQUE de asignaciones, bloqueo del sorteo, cascadas, utf8mb4, inyección SQL. **Deshace todo al terminar.** | 14–15 |
 
 - [ ] Resultado esperado: `¡Todas las pruebas pasaron! 🎄`
 
@@ -58,7 +58,19 @@ C:\xampp\php\php.exe tests\ejecutar_todas.php
 - [ ] 5 intentos fallidos → aviso de esperar 5 minutos.
 - [ ] Cerrar sesión desde el menú → vuelve al inicio.
 
-### 3.2 Crear y unirse
+### 3.2 Participar SIN cuenta (enlace personal)
+- [ ] En una ventana de incógnito (sin sesión), abre el enlace del intercambio → pide solo **nombre** (correo opcional), no pide login.
+- [ ] Al unirte aparece **"Tu enlace personal"** con "¡Guárdalo!", botón Copiar y WhatsApp.
+- [ ] Cierra la pestaña y vuelve a abrir el intercambio → entras directo (el navegador te recuerda).
+- [ ] Abre tu enlace personal en otro navegador → entras como tú.
+- [ ] Unirse con un nombre que ya existe → "Ya hay alguien con ese nombre".
+- [ ] Perfil, deseos, confirmación y revelación funcionan sin cuenta.
+- [ ] "No soy … · salir en este dispositivo" → el navegador te olvida (404 al volver sin enlace).
+- [ ] Paola (datos de prueba) entra con `…/p/bbbb…bbbb` (64 letras b).
+- [ ] Organizador: en Participantes, 🔑 copia el enlace de cada uno; ↻ genera uno nuevo y el anterior deja de funcionar.
+- [ ] Crear intercambio **sigue** pidiendo iniciar sesión.
+
+### 3.3 Crear y unirse con cuenta
 - [ ] Ana crea un intercambio nuevo: presupuesto mínimo > máximo → error; fecha límite después del evento → el navegador no lo permite.
 - [ ] Al crearlo aparece el código, la cuenta regresiva corre y dice "Eres el organizador".
 - [ ] **Copiar enlace** cambia a "¡Copiado!"; **WhatsApp** abre con el mensaje armado.
@@ -66,16 +78,16 @@ C:\xampp\php\php.exe tests\ejecutar_todas.php
 - [ ] Abrir el enlace de invitación sin sesión → pide login y luego regresa a la invitación.
 - [ ] El inicio muestra el próximo intercambio real del usuario con su cuenta regresiva.
 
-### 3.3 Perfil y lista de deseos
+### 3.4 Perfil y lista de deseos
 - [ ] Sofía confirma su participación → aparece ✓ junto a su nombre.
 - [ ] Sofía sube una foto (vista previa antes de guardar) → aparece en la lista de participantes.
 - [ ] Agregar deseo con enlace sin `https://` → error. Con todo correcto → aparece con su prioridad.
 - [ ] Editar y eliminar un deseo (con ventana de confirmación).
 - [ ] Imagen de más de 2 MB → marcada en rojo. Un `.txt` renombrado a `.jpg` → rechazado por el servidor.
 
-### 3.4 Panel de administración (Ana en Amigos 2026)
+### 3.5 Panel de administración (Ana en Amigos 2026)
 - [ ] Resumen muestra 5 participantes, 3 confirmados, porcentajes y días restantes.
-- [ ] Agregar `diego@prueba.com` → entra al momento. Agregar `otro@prueba.com` → se crea invitación personal.
+- [ ] Agregar a "Rosa Medina" solo con su nombre → aparece en la tabla con sus botones de enlace personal (🔑 y WhatsApp).
 - [ ] Editar a Carlos y marcarlo como confirmado.
 - [ ] Eliminar a un participante → desaparece junto con sus deseos.
 - [ ] Cerrar registro → con otra cuenta, el código ya no deja unirse. Reabrir registro.
@@ -83,7 +95,7 @@ C:\xampp\php\php.exe tests\ejecutar_todas.php
 - [ ] Configuración: cambiar el presupuesto y ver el cambio en la página del intercambio.
 - [ ] Tras guardar, el panel vuelve a abrir la misma pestaña.
 
-### 3.5 Sorteo
+### 3.6 Sorteo
 - [ ] La restricción Luis ↔ Sofía aparece en la pestaña Sorteo.
 - [ ] Con solo 3 personas, una restricción que haga imposible el sorteo → rechazada.
 - [ ] **Realizar sorteo** → "N asignaciones guardadas en secreto" (sin nombres).
@@ -92,14 +104,14 @@ C:\xampp\php\php.exe tests\ejecutar_todas.php
 - [ ] Después del sorteo no se puede agregar/eliminar participantes ni cambiar restricciones.
 - [ ] **Publicar resultados** → el botón Reiniciar desaparece.
 
-### 3.6 Revelación
+### 3.7 Revelación
 - [ ] Los participantes ven el botón **Descubrir a mi amigo secreto** (con latido).
 - [ ] La animación: el regalo tiembla → la tapa vuela → confeti → nombre, pistas y lista de deseos.
 - [ ] Al recargar ya no pide abrir el regalo y ofrece "Ver la animación otra vez".
 - [ ] El panel del organizador muestra "X de N ya descubrieron a su amigo secreto".
 - [ ] En **Oficina 2026** (ya publicado): Ana ve a Diego, Diego a Mariana, Mariana a Carlos y Carlos a Ana.
 
-### 3.7 Notificaciones, FAQ y extras
+### 3.8 Notificaciones, FAQ y extras
 - [ ] La campanita muestra el número de no leídas; al abrir una se marca como leída.
 - [ ] Unirse, confirmar, sortear y publicar generan los avisos correctos (ver tabla del Módulo 8).
 - [ ] "Marcar todas como leídas" quita el contador.

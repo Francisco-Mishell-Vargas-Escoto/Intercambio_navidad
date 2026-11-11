@@ -84,11 +84,11 @@ class Intercambio
     /** Nombres de los participantes (visibles para los miembros del intercambio). */
     public function nombresParticipantes(int $intercambioId): array
     {
-        $sql = 'SELECT u.nombre, u.foto, p.confirmado,
+        $sql = 'SELECT p.nombre, p.foto, p.confirmado,
                        (SELECT COUNT(*) FROM deseos d WHERE d.participante_id = p.id) AS total_deseos
-                FROM participantes p JOIN usuarios u ON u.id = p.usuario_id
+                FROM participantes p
                 WHERE p.intercambio_id = ?
-                ORDER BY u.nombre';
+                ORDER BY p.nombre';
         $st = $this->db->prepare($sql);
         $st->execute([$intercambioId]);
         return $st->fetchAll();

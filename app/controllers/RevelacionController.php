@@ -4,7 +4,8 @@
  * "Mi amigo secreto": cada participante ve SOLO a quién le regala, con su perfil y su lista de deseos.
  *
  * Privacidad:
- *  - La asignación se busca siempre con el ID del participante en sesión (nunca con un ID de la URL).
+ *  - La asignación se busca siempre con el participante actual (su enlace personal o su cuenta),
+ *    nunca con un ID que venga en la URL.
  *  - Solo funciona cuando el organizador ya publicó los resultados (estado "revelado").
  *  - La página se envía con "no-store" para que el navegador no la guarde en caché
  *    (útil en computadoras compartidas).
@@ -12,7 +13,7 @@
 
 require_once RUTA_APP . '/core/Controller.php';
 require_once RUTA_APP . '/models/Intercambio.php';
-require_once RUTA_APP . '/models/Participante.php';
+require_once RUTA_APP . '/core/Participacion.php';
 require_once RUTA_APP . '/models/Asignacion.php';
 require_once RUTA_APP . '/models/Deseo.php';
 
@@ -43,9 +44,6 @@ class RevelacionController extends Controller
     /** POST /intercambios/{id}/mi-amigo-secreto/visto  (lo llama el JavaScript al abrir el regalo) */
     public function marcarVisto(string $id): void
     {
-        if (!Auth::check()) {
-            $this->json(['ok' => false], 401);
-        }
         Csrf::verificar();   // el token viaja en el encabezado X-CSRF-Token
         list(, , $asignacion) = $this->cargar((int)$id);
         (new Asignacion())->marcarVista((int)$asignacion['id']);
@@ -57,9 +55,8 @@ class RevelacionController extends Controller
     /** Devuelve [intercambio, mi participación, mi asignación] o redirige con un mensaje. */
     private function cargar(int $intercambioId): array
     {
-        Auth::requerir();
         $i = (new Intercambio())->buscarPorId($intercambioId);
-        $yo = $i ? (new Participante())->buscar($intercambioId, Auth::id()) : null;
+        $yo = $i ? Participacion::actual($intercambioId) : null;   // enlace personal o cuenta
         if (!$yo) {
             http_response_code(404);
             $this->vista('errors/404', ['titulo' => 'No encontrado']);

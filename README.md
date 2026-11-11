@@ -58,8 +58,8 @@ Si tu MySQL tiene contraseña (o al publicar en internet), **no edites `config/c
 ## 3. Cómo se usa
 
 1. **Crear cuenta** → **Crear intercambio** (fechas, presupuesto, lugar, reglas). Recibes un código como `NAV-7K2-Q9X`.
-2. **Invitar**: comparte el código o el enlace (copiar, WhatsApp) o crea invitaciones personales desde el panel.
-3. Cada participante **se une**, **confirma** su asistencia y llena **su perfil y lista de deseos**.
+2. **Invitar**: comparte el código o el enlace (copiar, WhatsApp), agrega personas por nombre desde el panel o crea invitaciones personales.
+3. Cada participante **se une solo con su nombre (sin cuenta)** y recibe su **enlace personal** (`/p/…`), que funciona como su llave para volver. Confirma su asistencia y llena **su perfil y lista de deseos**.
 4. El organizador entra al **Panel de administración** → pestaña **Sorteo**: agrega restricciones si quiere (ej. parejas), **realiza el sorteo** y, cuando esté conforme, **publica los resultados** (puede reiniciar mientras no publique).
 5. Cada participante pulsa **Descubrir a mi amigo secreto** → animación → ve a quién le regala y su lista de deseos.
 
@@ -114,12 +114,13 @@ intercambio_navideno/
 |---|---|---|
 | `usuarios` | Cuentas (contraseña con hash) | — |
 | `intercambios` | Eventos; `estado`: abierto → cerrado → sorteado → revelado | `admin_id` → usuarios |
-| `participantes` | Usuario dentro de un intercambio + su perfil | → intercambios, usuarios |
+| `participantes` | Persona dentro de un intercambio (con o sin cuenta) + su perfil y su token de enlace personal | → intercambios, usuarios (opcional) |
 | `deseos` | Lista de deseos | → participantes |
 | `restricciones` | "A no le regala a B" | → participantes |
 | `asignaciones` | Resultado del sorteo (privado) | UNIQUE por dador y por receptor |
 | `invitaciones` | Enlaces personales con token | → intercambios |
-| `notificaciones` | Avisos de la campanita | → usuarios |
+| `notificaciones` | Avisos de la campanita (para cuentas) | → usuarios |
+| `migraciones` | Cambios de estructura ya aplicados (automáticos) | — |
 
 ---
 
@@ -147,7 +148,8 @@ Archivo: `app/services/SorteoService.php` (no depende de la base de datos).
 | CSRF | Token en todos los formularios POST y en `fetch` |
 | Robo de sesión | Cookie `HttpOnly`, `session_regenerate_id` al entrar, cierre por inactividad (2 h) |
 | Fuerza bruta | Bloqueo de 5 minutos tras 5 intentos fallidos |
-| Ver datos ajenos | Cada consulta filtra por el usuario en sesión; recursos ajenos responden 404 |
+| Ver datos ajenos | Cada consulta filtra por el participante actual (cuenta o enlace personal); recursos ajenos responden 404 |
+| Participantes sin cuenta | Enlace personal con token aleatorio de 64 caracteres; cookie `HttpOnly`; el organizador puede regenerarlo si se filtra |
 | Ver asignaciones ajenas | Solo existe `deDador()` con el participante de la sesión; nadie ve la lista completa |
 | Funciones de admin | Todas verifican `admin_id`; sin permiso → 404 |
 | Archivos maliciosos | Solo imágenes reales (`getimagesize`), 2 MB, nombre aleatorio, PHP bloqueado en `uploads/` |

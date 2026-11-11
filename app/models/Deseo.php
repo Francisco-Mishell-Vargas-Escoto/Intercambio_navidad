@@ -37,19 +37,27 @@ class Deseo
     }
 
     /**
-     * Busca un deseo SOLO si pertenece al usuario indicado.
+     * Busca un deseo SOLO si pertenece al participante indicado.
      * Así nadie puede editar o borrar deseos ajenos cambiando el número en la URL.
      */
-    public function buscarDeUsuario(int $deseoId, int $usuarioId): ?array
+    public function buscarDeParticipante(int $deseoId, int $participanteId): ?array
     {
         $sql = 'SELECT d.*, p.intercambio_id
                 FROM deseos d
                 JOIN participantes p ON p.id = d.participante_id
-                WHERE d.id = ? AND p.usuario_id = ?';
+                WHERE d.id = ? AND d.participante_id = ?';
         $st = $this->db->prepare($sql);
-        $st->execute([$deseoId, $usuarioId]);
+        $st->execute([$deseoId, $participanteId]);
         $fila = $st->fetch();
         return $fila ?: null;
+    }
+
+    /** Intercambio al que pertenece un deseo (para saber quién es el participante actual). */
+    public function intercambioDe(int $deseoId): int
+    {
+        $st = $this->db->prepare('SELECT p.intercambio_id FROM deseos d JOIN participantes p ON p.id = d.participante_id WHERE d.id = ?');
+        $st->execute([$deseoId]);
+        return (int)$st->fetchColumn();
     }
 
     public function actualizar(int $deseoId, array $d): void
