@@ -1,0 +1,8 @@
+# Archivo: public/.htaccess
+# Si el archivo pedido existe (css, js, imágenes) se entrega tal cual;
+# si no, todo se envía a index.php para que lo atienda el Router.
+Options -Indexes
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

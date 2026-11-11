@@ -1,0 +1,430 @@
+/* =====================================================================
+   Archivo: public/assets/css/estilos.css
+   Estilos navideños: rojo navideño, verde pino, blanco y dorado.
+   ===================================================================== */
+
+/* ---------- 1. Variables de color ---------- */
+:root {
+    --rojo:        #b3122e;
+    --rojo-oscuro: #8a0e23;
+    --pino:        #165b33;
+    --pino-oscuro: #0e3f23;
+    --dorado:      #d4a537;
+    --crema:       #fffaf3;
+    --texto:       #2b2b2b;
+    --radio:       16px;
+}
+
+/* ---------- 2. Base ---------- */
+body {
+    font-family: 'Poppins', system-ui, sans-serif;
+    background: var(--crema);
+    color: var(--texto);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.contenido-principal { flex: 1; position: relative; z-index: 1; }
+
+.titulo-festivo {
+    font-family: 'Mountains of Christmas', cursive;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    color: var(--rojo);
+}
+.titulo-seccion { font-weight: 600; color: var(--pino); }
+
+/* Utilidades de color */
+.text-navidad { color: var(--rojo) !important; }
+.text-pino    { color: var(--pino) !important; }
+.text-dorado  { color: var(--dorado) !important; }
+.bg-dorado    { background: var(--dorado) !important; color: #3d2c05; }
+
+/* ---------- 3. Nieve (canvas detrás del contenido) ---------- */
+#nieve {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;   /* no bloquea clics */
+    z-index: 0;
+}
+
+/* ---------- 4. Menú ---------- */
+.navbar-navidad {
+    background: var(--pino);
+    border-bottom: 3px solid var(--dorado);
+    z-index: 10;
+}
+.navbar-navidad .navbar-brand,
+.navbar-navidad .nav-link { color: #fff; font-weight: 500; }
+.navbar-navidad .nav-link:hover { color: var(--dorado); }
+.navbar-navidad .navbar-toggler { border-color: rgba(255,255,255,.5); }
+.navbar-navidad .navbar-toggler-icon { filter: invert(1); }
+
+/* ---------- 5. Botones ---------- */
+.btn-navidad, .btn-pino {
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding-inline: 1.4rem;
+    font-weight: 500;
+    transition: transform .2s, box-shadow .2s, background .2s;
+}
+.btn-navidad { background: var(--rojo); }
+.btn-navidad:hover { background: var(--rojo-oscuro); color: #fff; transform: translateY(-2px);
+                     box-shadow: 0 8px 18px rgba(179,18,46,.3); }
+.btn-pino { background: var(--pino); }
+.btn-pino:hover { background: var(--pino-oscuro); color: #fff; transform: translateY(-2px);
+                  box-shadow: 0 8px 18px rgba(22,91,51,.3); }
+
+/* ---------- 6. Hero ---------- */
+.hero {
+    background: radial-gradient(circle at top, #fff 0%, #fdeee9 60%, #f8dcd4 100%);
+    padding: 4rem 0 6rem;
+    border-bottom: 1px solid #f0d6cf;
+}
+.hero .lead { max-width: 620px; margin-inline: auto; }
+.hero-icono {
+    font-size: 3.2rem;
+    color: var(--dorado);
+    animation: flotar 3s ease-in-out infinite;
+}
+@keyframes flotar {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+}
+
+/* ---------- 7. Tarjetas ---------- */
+.tarjeta-intercambio, .tarjeta-paso {
+    border: none;
+    border-radius: var(--radio);
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    transition: transform .25s, box-shadow .25s;
+    background: #fff;
+}
+.tarjeta-intercambio { border-top: 6px solid var(--rojo); }
+.tarjeta-intercambio:hover, .tarjeta-paso:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.12);
+}
+.mt-n5 { margin-top: -3.5rem; }
+.icono-arbol { font-size: 2.4rem; color: var(--pino); }
+
+.dato {
+    background: #f7f3ec;
+    border-radius: 12px;
+    padding: .8rem 1rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: .7rem;
+    align-items: center;
+}
+.dato i { grid-row: span 2; font-size: 1.5rem; color: var(--rojo); }
+.dato small { color: #777; line-height: 1; }
+
+.paso-numero {
+    width: 32px; height: 32px; margin: 0 auto .6rem;
+    border-radius: 50%;
+    background: var(--dorado); color: #3d2c05;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+}
+.paso-icono { font-size: 2rem; color: var(--pino); }
+
+/* ---------- 8. Cuenta regresiva ---------- */
+.cuenta-regresiva {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .6rem;
+    text-align: center;
+}
+.cuenta-regresiva div {
+    background: var(--pino);
+    color: #fff;
+    border-radius: 12px;
+    padding: .7rem .3rem;
+}
+.cuenta-regresiva span { display: block; font-size: 1.6rem; font-weight: 600; }
+.cuenta-regresiva small { opacity: .8; font-size: .75rem; }
+
+/* ---------- 8b. Formularios ---------- */
+.btn-dorado {
+    background: var(--dorado);
+    color: #3d2c05;
+    border-radius: 50px;
+    font-weight: 500;
+    padding-inline: 1rem;
+}
+.btn-dorado:hover { background: #c39226; color: #2a1e03; }
+.tarjeta-form:hover { transform: none; }          /* el formulario no "salta" al pasar el mouse */
+.icono-form {
+    width: 64px; height: 64px; margin: 0 auto;
+    border-radius: 50%;
+    background: #fdeee9;
+    color: var(--rojo);
+    font-size: 1.8rem;
+    display: flex; align-items: center; justify-content: center;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--pino);
+    box-shadow: 0 0 0 .2rem rgba(22, 91, 51, .2);
+}
+.dropdown-item.text-navidad:active { background: #fdeee9; }
+
+/* ---------- 8c. Intercambios ---------- */
+.seccion-form { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.2rem; color: var(--pino); }
+.seccion-form span {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--rojo); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .9rem;
+}
+.hero-intercambio { padding: 3rem 0 5.5rem; }
+.hero-intercambio .titulo-festivo { font-size: clamp(2.2rem, 5vw, 3.4rem); }
+.codigo-acceso {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    color: var(--rojo);
+    background: #fdeee9;
+    border: 2px dashed var(--dorado);
+    border-radius: 12px;
+    padding: .6rem;
+}
+.input-codigo {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    font-family: ui-monospace, Consolas, monospace;
+    font-weight: 600;
+}
+.tarjeta-secreto { border-top-color: var(--pino); }
+.texto-reglas { white-space: normal; }
+.lista-iconos li { margin-bottom: .3rem; }
+.lista-iconos i { color: var(--rojo); margin-right: .3rem; }
+.lista-participantes li { display: flex; align-items: center; gap: .6rem; padding: .35rem 0; }
+.avatar {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--pino); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 600;
+    border: 2px solid var(--dorado);
+}
+a.tarjeta-intercambio:focus-visible { outline: 3px solid var(--dorado); }
+
+/* ---------- 8d. Perfil y lista de deseos ---------- */
+.tarjeta-confirmada { border-top-color: var(--pino); }
+.avatar-lg { width: 72px; height: 72px; font-size: 1.4rem; }
+.deseo {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: .9rem;
+    border: 1px solid #f0e6da;
+    border-radius: 12px;
+    transition: background .2s, border-color .2s;
+}
+.deseo:hover { background: #fffaf3; border-color: var(--dorado); }
+.deseo-img {
+    width: 72px; height: 72px; flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+.deseo-img-vacia {
+    display: flex; align-items: center; justify-content: center;
+    background: #fdeee9; color: var(--rojo); font-size: 1.6rem;
+}
+.min-w-0 { min-width: 0; }
+
+/* ---------- 8e. Panel de administración ---------- */
+.bg-pino { background-color: var(--pino) !important; }
+.pestanas-admin { gap: .4rem; flex-wrap: wrap; }
+.pestanas-admin .nav-link {
+    border-radius: 50px;
+    color: var(--pino);
+    background: #fff;
+    border: 1px solid #e6dccd;
+    font-weight: 500;
+}
+.pestanas-admin .nav-link.active { background: var(--pino); color: #fff; border-color: var(--pino); }
+.tarjeta-stat {
+    border: none;
+    border-radius: var(--radio);
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,.06);
+    transition: transform .25s;
+}
+.tarjeta-stat:hover { transform: translateY(-4px); }
+.tarjeta-stat i { font-size: 1.4rem; color: var(--rojo); }
+.stat-valor { font-size: 2rem; font-weight: 600; line-height: 1.1; color: var(--pino); }
+.progress { height: 6px; background: #efe7da; }
+.tabla-admin th { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: #888; font-weight: 500; }
+.tabla-admin td, .tabla-admin th { padding: .8rem 1rem; }
+.invitacion {
+    display: flex; align-items: center; gap: .8rem;
+    padding: .7rem .9rem;
+    border: 1px solid #f0e6da;
+    border-radius: 12px;
+}
+.invitacion:hover { border-color: var(--dorado); }
+
+/* ---------- 8f. Revelación del amigo secreto ---------- */
+.escenario-revelacion {
+    position: relative;
+    overflow: hidden;
+    padding: 3.5rem 0 3rem;
+    background: radial-gradient(circle at 50% 60%, #fff 0%, #fdeee9 55%, #f6d5cc 100%);
+    border-bottom: 1px solid #f0d6cf;
+    min-height: 460px;
+}
+#confeti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+
+/* Qué se ve antes y después de abrir */
+.despues-de-abrir, .contenido-receptor { display: none; }
+.escenario-revelacion.abierto .antes-de-abrir { display: none; }
+.escenario-revelacion.abierto .despues-de-abrir { display: block; animation: aparecer .8s ease-out both; }
+.escenario-revelacion.abierto + .contenido-receptor { display: block; animation: aparecer .8s .3s ease-out both; }
+@keyframes aparecer {
+    from { opacity: 0; transform: translateY(20px) scale(.96); }
+    to   { opacity: 1; transform: none; }
+}
+.nombre-receptor { outline: none; font-size: clamp(2.6rem, 7vw, 4.5rem); }
+.avatar-xl { width: 120px; height: 120px; font-size: 2.4rem; border-width: 4px; }
+
+/* El regalo dibujado con CSS */
+.regalo {
+    position: relative;
+    width: 170px; height: 170px;
+    margin: 0 auto;
+    display: block;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform .2s;
+}
+.regalo:hover { transform: scale(1.05) rotate(-2deg); }
+.regalo:focus-visible { outline: 3px dashed var(--dorado); outline-offset: 12px; border-radius: 12px; }
+.regalo-caja {
+    position: absolute; left: 10px; right: 10px; bottom: 0; height: 110px;
+    background: var(--rojo);
+    border-radius: 6px;
+    box-shadow: inset 0 -12px 0 rgba(0,0,0,.12);
+}
+.regalo-caja::before {                      /* listón vertical */
+    content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 24px;
+    transform: translateX(-50%);
+    background: var(--dorado);
+}
+.regalo-tapa {
+    position: absolute; left: 0; right: 0; top: 30px; height: 40px;
+    background: var(--rojo-oscuro);
+    border-radius: 6px;
+    z-index: 1;
+    transition: transform .6s cubic-bezier(.3, 1.6, .5, 1), opacity .6s;
+}
+.regalo-tapa::before {                      /* listón de la tapa */
+    content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 24px;
+    transform: translateX(-50%);
+    background: #e3b54a;
+}
+.regalo-mono {                              /* moño */
+    position: absolute; left: 50%; top: -30px; width: 70px; height: 34px;
+    transform: translateX(-50%);
+}
+.regalo-mono::before, .regalo-mono::after {
+    content: ''; position: absolute; top: 0; width: 34px; height: 34px;
+    border: 9px solid var(--dorado);
+    border-radius: 50% 50% 0 50%;
+}
+.regalo-mono::before { left: 0; transform: rotate(-20deg); }
+.regalo-mono::after  { right: 0; transform: scaleX(-1) rotate(-20deg); }
+
+.regalo:not(.temblando):not(.abriendo) { animation: flotar 3s ease-in-out infinite; }
+.regalo.temblando { animation: temblar .12s linear infinite; }
+@keyframes temblar {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-6deg) translateY(-2px); }
+    75% { transform: rotate(6deg) translateY(-2px); }
+}
+.regalo.abriendo .regalo-tapa { transform: translateY(-140px) rotate(-35deg); opacity: 0; }
+
+/* Pistas del perfil */
+.pista { display: flex; gap: .8rem; padding: .7rem 0; border-bottom: 1px dashed #eadfce; }
+.pista:last-child { border-bottom: none; }
+.pista > i { font-size: 1.2rem; color: var(--pino); margin-top: .2rem; }
+.pista small { color: #888; }
+.pista-no > i, .pista-no small { color: var(--rojo); }
+
+/* Tarjeta de "Descubrir" en la página del intercambio */
+.btn-descubrir { animation: latido 1.6s ease-in-out infinite; }
+@keyframes latido {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(179, 18, 46, .45); }
+    50%      { box-shadow: 0 0 0 10px rgba(179, 18, 46, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .regalo, .regalo.temblando, .btn-descubrir { animation: none !important; }
+}
+
+/* ---------- 8g. Notificaciones, FAQ y mensajes ---------- */
+.campanita { font-size: 1.15rem; }
+.contador-notif {
+    position: absolute; top: 2px; right: -4px;
+    font-size: .65rem; padding: .25em .45em;
+}
+.menu-notif { width: 340px; max-width: 92vw; overflow: hidden; border-radius: 14px; }
+.notif {
+    display: flex; gap: .7rem; align-items: flex-start;
+    white-space: normal;
+    padding: .7rem 1rem;
+    font-size: .9rem;
+}
+.notif > i { color: var(--pino); font-size: 1.1rem; margin-top: .1rem; }
+.notif.no-leida { background: #fdf3ef; }
+.notif.no-leida > i { color: var(--rojo); }
+.punto-nuevo { width: 10px; height: 10px; border-radius: 50%; background: var(--rojo); margin-top: .4rem; flex-shrink: 0; }
+
+.acordeon-navidad .accordion-item { border: none; margin-bottom: .7rem; border-radius: 14px !important; overflow: hidden;
+                                    box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+.acordeon-navidad .accordion-button { font-weight: 500; }
+.acordeon-navidad .accordion-button:not(.collapsed) { background: #fdeee9; color: var(--rojo); box-shadow: none; }
+.acordeon-navidad .accordion-button:focus { box-shadow: 0 0 0 .2rem rgba(212, 165, 55, .4); }
+
+.mensaje-del-dia {
+    max-width: 620px;
+    padding: 1.4rem 1.6rem;
+    background: #fff;
+    border: 2px dashed var(--dorado);
+    border-radius: 18px;
+    font-style: italic;
+    font-size: 1.1rem;
+}
+.mensaje-del-dia > i { font-size: 1.6rem; }
+.aparecer-texto { animation: aparecer .5s ease-out; }
+
+/* ---------- 9. Pie ---------- */
+.pie-navidad {
+    background: var(--rojo);
+    color: #fff;
+    border-top: 3px solid var(--dorado);
+    position: relative;
+    z-index: 1;
+}
+.mensaje-navideno { font-style: italic; }
+
+/* ---------- 10. Responsive ---------- */
+@media (max-width: 576px) {
+    .hero { padding: 3rem 0 5rem; }
+    .cuenta-regresiva span { font-size: 1.25rem; }
+}
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+    .hero-icono { animation: none; }
+    #nieve { display: none; }
+}

@@ -1,0 +1,6 @@
+# Archivo: .htaccess (en la RAÍZ del proyecto)
+# Envía todas las peticiones a la carpeta public/.
+# Así config/, app/ y database/ NUNCA son accesibles desde el navegador.
+Options -Indexes
+RewriteEngine On
+RewriteRule ^(.*)$ public/$1 [L]

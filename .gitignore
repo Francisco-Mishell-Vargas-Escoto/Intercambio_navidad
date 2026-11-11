@@ -1,0 +1,19 @@
+# Archivo: .gitignore
+# Lo que NO se sube a GitHub.
+
+# Contraseñas y datos privados del servidor
+config/config.local.php
+
+# Fotos que suben los usuarios (se conservan las carpetas y su protección)
+public/uploads/fotos/*
+public/uploads/deseos/*
+!public/uploads/fotos/.gitkeep
+!public/uploads/deseos/.gitkeep
+
+# Archivos del sistema y editores
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.log

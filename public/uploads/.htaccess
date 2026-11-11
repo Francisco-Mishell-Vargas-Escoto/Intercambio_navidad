@@ -1,0 +1,6 @@
+# Archivo: public/uploads/.htaccess
+# Seguridad: aunque alguien suba un archivo .php, aquí nunca se ejecuta.
+<FilesMatch "\.(php|phtml|php3|php4|php5|phar)$">
+    Require all denied
+</FilesMatch>
+Options -Indexes
