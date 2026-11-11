@@ -122,13 +122,13 @@ if ($proximo) {
             ['bi-shuffle', 'Haz el sorteo', 'Asignaciones aleatorias, justas y secretas.'],
             ['bi-box2-heart', 'Descubre y regala', 'Revela a tu amigo secreto y mira su lista de deseos.'],
         ];
-        foreach ($pasos as $i => [$icono, $titulo, $texto]): ?>
+        foreach ($pasos as $n => [$icono, $tituloPaso, $texto]): ?>
             <div class="col-sm-6 col-lg-3">
                 <div class="card tarjeta-paso h-100 text-center">
                     <div class="card-body">
-                        <div class="paso-numero"><?= $i + 1 ?></div>
+                        <div class="paso-numero"><?= $n + 1 ?></div>
                         <i class="bi <?= $icono ?> paso-icono"></i>
-                        <h3 class="h6 mt-2"><?= e($titulo) ?></h3>
+                        <h3 class="h6 mt-2"><?= e($tituloPaso) ?></h3>
                         <p class="small text-muted mb-0"><?= e($texto) ?></p>
                     </div>
                 </div>
