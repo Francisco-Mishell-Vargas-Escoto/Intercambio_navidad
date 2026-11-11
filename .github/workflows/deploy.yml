@@ -60,6 +60,7 @@ jobs:
           username: ${{ env.FTP_USUARIO }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: htdocs/
+          timeout: 120000          # el FTP gratuito a veces tarda en responder (ms)
           exclude: |
             **/.git*
             **/.git*/**
