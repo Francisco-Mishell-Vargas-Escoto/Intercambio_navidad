@@ -141,7 +141,7 @@ $base = $esquema . '://' . $_SERVER['HTTP_HOST'];
                             <div class="col-md-3 d-grid">
                                 <button class="btn btn-pino"><i class="bi bi-plus-circle"></i> Agregar</button>
                             </div>
-                            <div class="form-text">No necesita cuenta. Después envíale su <strong>enlace personal</strong> con los botones de la tabla.</div>
+                            <div class="form-text">No necesita cuenta. Después envíale su <strong>código personal</strong> y su enlace con los botones de la tabla.</div>
                         </form>
                     <?php endif; ?>
                 </div>
@@ -172,6 +172,8 @@ $base = $esquema . '://' . $_SERVER['HTTP_HOST'];
                                                     <div class="fw-medium"><?= e($p['nombre']) ?>
                                                         <?php if ((int)$p['usuario_id'] === (int)$i['admin_id']): ?><span class="badge bg-dorado">Tú</span><?php endif; ?></div>
                                                     <div class="small text-muted text-truncate"><?= e($p['email'] ?: ($p['usuario_id'] ? 'Con cuenta' : 'Sin correo')) ?></div>
+                                                    <div class="small"><i class="bi bi-key text-dorado"></i>
+                                                        <code class="text-pino" title="Código personal"><?= e(CodigoService::formatearPersonal($p['codigo'])) ?></code></div>
                                                 </div>
                                             </div>
                                         </td>
@@ -184,20 +186,21 @@ $base = $esquema . '://' . $_SERVER['HTTP_HOST'];
                                         <td class="text-end text-nowrap">
                                             <?php
                                             $enlaceP = Participacion::enlace($p);
-                                            $textoP = '¡Hola ' . explode(' ', $p['nombre'])[0] . '! Este es tu enlace personal para el intercambio "'
-                                                    . $i['nombre'] . '" (no lo compartas): ' . $enlaceP;
+                                            $codigoP = CodigoService::formatearPersonal($p['codigo']);
+                                            $textoP = '¡Hola ' . explode(' ', $p['nombre'])[0] . '! Tus datos para el intercambio "' . $i['nombre']
+                                                    . '" (no los compartas). Código personal: ' . $codigoP . ' · Enlace directo: ' . $enlaceP;
                                             ?>
                                             <button type="button" class="btn btn-sm btn-outline-secondary" data-copiar="<?= e($enlaceP) ?>"
                                                     aria-label="Copiar enlace personal de <?= e($p['nombre']) ?>" title="Copiar enlace personal">
-                                                <i class="bi bi-key"></i></button>
+                                                <i class="bi bi-link-45deg"></i></button>
                                             <a class="btn btn-sm btn-outline-success" target="_blank" rel="noopener" title="Enviar enlace por WhatsApp"
                                                href="https://wa.me/?text=<?= rawurlencode($textoP) ?>" aria-label="Enviar enlace por WhatsApp">
                                                 <i class="bi bi-whatsapp"></i></a>
                                             <form method="post" class="d-inline"
                                                   action="<?= url('intercambios/' . (int)$i['id'] . '/admin/participantes/' . (int)$p['id'] . '/enlace') ?>"
-                                                  data-confirmar="¿Generar un enlace personal nuevo para <?= e($p['nombre']) ?>? El actual dejará de funcionar.">
+                                                  data-confirmar="¿Generar código y enlace personal NUEVOS para <?= e($p['nombre']) ?>? Los actuales dejarán de funcionar.">
                                                 <?= Csrf::campo() ?>
-                                                <button class="btn btn-sm btn-outline-secondary" aria-label="Generar enlace nuevo" title="Generar enlace nuevo">
+                                                <button class="btn btn-sm btn-outline-secondary" aria-label="Generar código y enlace nuevos" title="Generar código y enlace nuevos">
                                                     <i class="bi bi-arrow-repeat"></i></button>
                                             </form>
                                             <a href="<?= url('intercambios/' . (int)$i['id'] . '/admin/participantes/' . (int)$p['id']) ?>"

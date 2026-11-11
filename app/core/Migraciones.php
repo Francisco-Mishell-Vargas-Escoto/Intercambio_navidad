@@ -12,7 +12,7 @@
 class Migraciones
 {
     /** Versión más reciente. Súbela cuando agregues una migración nueva abajo. */
-    const ULTIMA = 1;
+    const ULTIMA = 2;
 
     public static function ejecutar(PDO $db): void
     {
@@ -83,6 +83,27 @@ class Migraciones
         $hayIndice = $db->query("SHOW INDEX FROM participantes WHERE Key_name = 'uq_participante_token'")->fetch();
         if (!$hayIndice) {
             $db->exec('ALTER TABLE participantes ADD UNIQUE KEY uq_participante_token (token)');
+        }
+    }
+
+    /**
+     * v2 · Código personal corto para volver a entrar (/entrar), además del enlace personal.
+     */
+    private static function v2(PDO $db): void
+    {
+        if (!self::hayColumna($db, 'participantes', 'codigo')) {
+            $db->exec('ALTER TABLE participantes ADD codigo CHAR(8) NULL AFTER token');
+        }
+        require_once RUTA_APP . '/services/CodigoService.php';
+        $ids = $db->query('SELECT id FROM participantes WHERE codigo IS NULL')->fetchAll(PDO::FETCH_COLUMN);
+        $st = $db->prepare('UPDATE participantes SET codigo = ? WHERE id = ?');
+        foreach ($ids as $id) {
+            $st->execute([CodigoService::codigoPersonalUnico($db), $id]);
+        }
+        $db->exec('ALTER TABLE participantes MODIFY codigo CHAR(8) NOT NULL');
+        $hayIndice = $db->query("SHOW INDEX FROM participantes WHERE Key_name = 'uq_participante_codigo'")->fetch();
+        if (!$hayIndice) {
+            $db->exec('ALTER TABLE participantes ADD UNIQUE KEY uq_participante_codigo (codigo)');
         }
     }
 }

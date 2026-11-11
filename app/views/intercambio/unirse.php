@@ -25,7 +25,8 @@
                             <i class="bi bi-search"></i> Buscar intercambio
                         </button>
                     </form>
-                    <p class="small text-muted mt-4 mb-0">¿Te enviaron un enlace? Ábrelo directamente y te traerá aquí.</p>
+                    <p class="small text-muted mt-4 mb-1">¿Te enviaron un enlace? Ábrelo directamente y te traerá aquí.</p>
+                    <p class="small text-muted mb-0">¿Ya te uniste antes? <a href="<?= url('entrar') ?>" class="text-pino fw-medium">Entra con tu código personal</a></p>
                 </div>
             </div>
         </div>

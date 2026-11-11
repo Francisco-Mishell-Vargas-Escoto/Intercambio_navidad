@@ -65,7 +65,7 @@ CREATE TABLE intercambios (
 -- ---------------------------------------------------------------------
 -- 3. PARTICIPANTES: personas dentro de un intercambio, con su perfil.
 --    NO necesitan cuenta: entran con su nombre y reciben un enlace
---    personal secreto (token). usuario_id solo se llena si la persona
+--    personal secreto (token) y un código personal corto para volver a entrar. usuario_id solo se llena si la persona
 --    tiene cuenta (por ejemplo, el organizador cuando también participa).
 -- ---------------------------------------------------------------------
 CREATE TABLE participantes (
@@ -76,6 +76,7 @@ CREATE TABLE participantes (
     email           VARCHAR(150) NULL,
     foto            VARCHAR(255) NULL,           -- archivo en public/uploads
     token           CHAR(64)     NOT NULL,       -- llave del enlace personal /p/{token}
+    codigo          CHAR(8)      NOT NULL,       -- código personal corto para entrar (/entrar)
     gustos          TEXT         NULL,   -- gustos personales
     intereses       TEXT         NULL,   -- intereses / hobbies
     no_le_gusta     TEXT         NULL,   -- cosas que NO le gustaría recibir
@@ -85,6 +86,7 @@ CREATE TABLE participantes (
     creado_en       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_participante (intercambio_id, usuario_id), -- una cuenta no se une dos veces
     UNIQUE KEY uq_participante_token (token),
+    UNIQUE KEY uq_participante_codigo (codigo),
     CONSTRAINT fk_part_intercambio FOREIGN KEY (intercambio_id)
         REFERENCES intercambios(id) ON DELETE CASCADE,
     CONSTRAINT fk_part_usuario FOREIGN KEY (usuario_id)
@@ -192,4 +194,4 @@ CREATE TABLE migraciones (
     aplicada_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO migraciones (version) VALUES (1);
+INSERT INTO migraciones (version) VALUES (1), (2);

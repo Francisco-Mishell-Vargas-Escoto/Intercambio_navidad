@@ -2,8 +2,11 @@
 /**
  * Archivo: app/models/Participante.php
  * Consultas a la tabla `participantes`.
- * Un participante puede no tener cuenta: se identifica con su token (enlace personal).
+ * Un participante puede no tener cuenta: se identifica con su token (enlace personal)
+ * o con su código personal corto.
  */
+
+require_once RUTA_APP . '/services/CodigoService.php';
 
 class Participante
 {
@@ -20,9 +23,10 @@ class Participante
      */
     public function crear(int $intercambioId, string $nombre, ?string $email, ?int $usuarioId = null): array
     {
-        $token = bin2hex(random_bytes(32));   // 64 caracteres imposibles de adivinar
-        $st = $this->db->prepare('INSERT INTO participantes (intercambio_id, usuario_id, nombre, email, token) VALUES (?, ?, ?, ?, ?)');
-        $st->execute([$intercambioId, $usuarioId, $nombre, $email ? mb_strtolower($email) : null, $token]);
+        $token = bin2hex(random_bytes(32));                       // enlace personal: 64 caracteres
+        $codigo = CodigoService::codigoPersonalUnico($this->db);  // código personal: 8 caracteres
+        $st = $this->db->prepare('INSERT INTO participantes (intercambio_id, usuario_id, nombre, email, token, codigo) VALUES (?, ?, ?, ?, ?, ?)');
+        $st->execute([$intercambioId, $usuarioId, $nombre, $email ? mb_strtolower($email) : null, $token, $codigo]);
         return $this->buscarPorToken($token);
     }
 
@@ -37,6 +41,15 @@ class Participante
     {
         $st = $this->db->prepare('SELECT * FROM participantes WHERE token = ?');
         $st->execute([$token]);
+        $fila = $st->fetch();
+        return $fila ?: null;
+    }
+
+    /** Busca por código personal (ya normalizado: mayúsculas, sin guiones). */
+    public function buscarPorCodigo(string $codigo): ?array
+    {
+        $st = $this->db->prepare('SELECT * FROM participantes WHERE codigo = ?');
+        $st->execute([$codigo]);
         $fila = $st->fetch();
         return $fila ?: null;
     }
@@ -82,12 +95,16 @@ class Participante
         $st->execute([$confirmado ? 1 : 0, $participanteId]);
     }
 
-    /** Genera un enlace personal nuevo: el anterior deja de funcionar. Devuelve el token nuevo. */
+    /**
+     * Genera un enlace personal y un código personal NUEVOS: los anteriores dejan de funcionar.
+     * Devuelve el token nuevo.
+     */
     public function regenerarToken(int $participanteId): string
     {
         $token = bin2hex(random_bytes(32));
-        $st = $this->db->prepare('UPDATE participantes SET token = ? WHERE id = ?');
-        $st->execute([$token, $participanteId]);
+        $codigo = CodigoService::codigoPersonalUnico($this->db);
+        $st = $this->db->prepare('UPDATE participantes SET token = ?, codigo = ? WHERE id = ?');
+        $st->execute([$token, $codigo, $participanteId]);
         return $token;
     }
 

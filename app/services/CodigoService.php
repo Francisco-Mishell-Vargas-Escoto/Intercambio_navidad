@@ -21,6 +21,26 @@ class CodigoService
         return $codigo;
     }
 
+    /**
+     * Código PERSONAL de un participante: 8 caracteres (ej. K7M2QX9P, se muestra K7M2-QX9P).
+     * Hay 31^8 ≈ 850 mil millones de combinaciones, así que no se puede adivinar.
+     */
+    public static function codigoPersonalUnico(PDO $db): string
+    {
+        $st = $db->prepare('SELECT COUNT(*) FROM participantes WHERE codigo = ?');
+        do {
+            $codigo = self::aleatorio(8);
+            $st->execute([$codigo]);
+        } while ((int)$st->fetchColumn() > 0);
+        return $codigo;
+    }
+
+    /** Formato del código personal: K7M2QX9P => K7M2-QX9P */
+    public static function formatearPersonal(string $codigo): string
+    {
+        return implode('-', str_split($codigo, 4));
+    }
+
     /** Cadena aleatoria segura (random_int usa el generador criptográfico del sistema). */
     public static function aleatorio(int $largo): string
     {

@@ -200,6 +200,18 @@ body {
     font-weight: 600;
 }
 .tarjeta-secreto { border-top-color: var(--pino); }
+.codigo-personal {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    color: var(--pino);
+    background: #eef6f0;
+    border: 2px dashed var(--pino);
+    border-radius: 10px;
+    padding: .25rem .8rem;
+}
+.tarjeta-enlace.destacada { border-top-color: var(--dorado); box-shadow: 0 0 0 3px rgba(212,165,55,.35), 0 10px 30px rgba(0,0,0,.08); }
 .texto-reglas { white-space: normal; }
 .lista-iconos li { margin-bottom: .3rem; }
 .lista-iconos i { color: var(--rojo); margin-right: .3rem; }

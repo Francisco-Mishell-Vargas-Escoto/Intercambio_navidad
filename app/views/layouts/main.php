@@ -93,6 +93,7 @@
                         </ul>
                     </li>
                 <?php else: ?>
+                    <li class="nav-item"><a class="nav-link" href="<?= url('entrar') ?>"><i class="bi bi-key"></i> Entrar con mi código</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('login') ?>">Iniciar sesión</a></li>
                     <li class="nav-item"><a class="btn btn-sm btn-dorado" href="<?= url('registro') ?>">Crear cuenta</a></li>
                 <?php endif; ?>

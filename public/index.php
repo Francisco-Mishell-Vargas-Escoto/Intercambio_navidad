@@ -46,6 +46,8 @@ $router->get('/unirse/{codigo}', 'IntercambioController@confirmarUnirse');
 $router->post('/unirse/{codigo}', 'IntercambioController@unirse');
 $router->get('/p/{token}', 'IntercambioController@enlacePersonal');          // enlace personal del participante
 $router->post('/intercambios/{id}/salir', 'IntercambioController@olvidarDispositivo');
+$router->get('/entrar', 'IntercambioController@formularioEntrar');            // entrar con el código personal
+$router->post('/entrar', 'IntercambioController@entrar');
 
 // Módulo 4: perfil, confirmación y lista de deseos
 $router->get('/intercambios/{id}/perfil', 'ParticipanteController@perfil');

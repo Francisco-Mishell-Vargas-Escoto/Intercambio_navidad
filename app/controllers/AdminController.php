@@ -135,7 +135,7 @@ class AdminController extends Controller
         $p = $partModelo->crear((int)$i['id'], $v->valor('nombre'), $v->valor('email') ?: null,
                                 $usuario ? (int)$usuario['id'] : null);
         NotificacionService::nuevoParticipante($i, $p, true);
-        flash('success', 'Agregaste a ' . $p['nombre'] . '. Envíale su enlace personal con los botones de la tabla.');
+        flash('success', 'Agregaste a ' . $p['nombre'] . ' (código ' . CodigoService::formatearPersonal($p['codigo']) . '). Envíale sus datos con los botones de la tabla.');
         redirigir($ruta);
     }
 
@@ -146,7 +146,7 @@ class AdminController extends Controller
         Csrf::verificar();
         $p = $this->cargarParticipante($i, (int)$pid);
         (new Participante())->regenerarToken((int)$p['id']);
-        flash('success', 'Nuevo enlace personal para ' . $p['nombre'] . '. El anterior ya no funciona; envíale el nuevo.');
+        flash('success', 'Nuevo código y enlace personal para ' . $p['nombre'] . '. Los anteriores ya no funcionan; envíale los nuevos.');
         redirigir('intercambios/' . $i['id'] . '/admin#participantes');
     }
 

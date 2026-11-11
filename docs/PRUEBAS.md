@@ -41,7 +41,7 @@ C:\xampp\php\php.exe tests\ejecutar_todas.php
 |---|---|---|
 | `tests/test_sorteo.php` | Algoritmo: miles de sorteos válidos, restricciones, casos imposibles, aleatoriedad, 200 participantes | 11 |
 | `tests/test_validaciones.php` | Validación de formularios y fechas, presupuesto, códigos, escape XSS, subida de imágenes | 28 |
-| `tests/test_base_datos.php` | Contra tu MySQL: correos y códigos únicos, participantes sin cuenta, tokens únicos, UNIQUE de asignaciones, bloqueo del sorteo, cascadas, utf8mb4, inyección SQL. **Deshace todo al terminar.** | 14–15 |
+| `tests/test_base_datos.php` | Contra tu MySQL: correos y códigos únicos, participantes sin cuenta, tokens únicos, UNIQUE de asignaciones, bloqueo del sorteo, cascadas, utf8mb4, inyección SQL. **Deshace todo al terminar.** | 15–16 |
 
 - [ ] Resultado esperado: `¡Todas las pruebas pasaron! 🎄`
 
@@ -60,14 +60,16 @@ C:\xampp\php\php.exe tests\ejecutar_todas.php
 
 ### 3.2 Participar SIN cuenta (enlace personal)
 - [ ] En una ventana de incógnito (sin sesión), abre el enlace del intercambio → pide solo **nombre** (correo opcional), no pide login.
-- [ ] Al unirte aparece **"Tu enlace personal"** con "¡Guárdalo!", botón Copiar y WhatsApp.
+- [ ] Al unirte aparece **"Tu código y tu enlace personal"** con "¡Guárdalos!": el código (ej. `K7M2-QX9P`), botones Copiar y WhatsApp.
+- [ ] En otro navegador, menú **Entrar con mi código** → escribe tu código (con o sin guion, en minúsculas) → entras como tú.
+- [ ] Un código inventado → "Ese código no existe"; al 5.º intento fallido → espera de 10 minutos.
 - [ ] Cierra la pestaña y vuelve a abrir el intercambio → entras directo (el navegador te recuerda).
 - [ ] Abre tu enlace personal en otro navegador → entras como tú.
 - [ ] Unirse con un nombre que ya existe → "Ya hay alguien con ese nombre".
 - [ ] Perfil, deseos, confirmación y revelación funcionan sin cuenta.
 - [ ] "No soy … · salir en este dispositivo" → el navegador te olvida (404 al volver sin enlace).
-- [ ] Paola (datos de prueba) entra con `…/p/bbbb…bbbb` (64 letras b).
-- [ ] Organizador: en Participantes, 🔑 copia el enlace de cada uno; ↻ genera uno nuevo y el anterior deja de funcionar.
+- [ ] Paola (datos de prueba) entra con su código **PAQT-2345** o con `…/p/bbbb…bbbb` (64 letras b).
+- [ ] Organizador: en Participantes ve el código de cada uno, copia su enlace o se los envía por WhatsApp; ↻ genera código y enlace nuevos y los anteriores dejan de funcionar.
 - [ ] Crear intercambio **sigue** pidiendo iniciar sesión.
 
 ### 3.3 Crear y unirse con cuenta

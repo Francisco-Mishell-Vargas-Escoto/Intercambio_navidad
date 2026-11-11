@@ -96,12 +96,51 @@ class IntercambioController extends Controller
         redirigir('intercambios/' . $p['intercambio_id']);
     }
 
+    /** GET /entrar  — formulario para entrar con el código personal */
+    public function formularioEntrar(): void
+    {
+        $this->vista('intercambio/entrar', ['titulo' => 'Entrar con mi código']);
+    }
+
+    /**
+     * POST /entrar  — entra con el código personal (ej. K7M2-QX9P).
+     * Protección contra adivinar códigos: máximo 5 intentos fallidos cada 10 minutos.
+     */
+    public function entrar(): void
+    {
+        Csrf::verificar();
+
+        $bloqueo = $_SESSION['entrar_bloqueado_hasta'] ?? 0;
+        if ($bloqueo > time()) {
+            $min = (int)ceil(($bloqueo - time()) / 60);
+            $this->regresarConErrores('entrar', ['codigo' => "Demasiados intentos. Espera $min minuto(s) e inténtalo de nuevo."], []);
+        }
+
+        $codigo = CodigoService::normalizar((string)($_POST['codigo'] ?? ''));
+        $p = strlen($codigo) === 8 ? (new Participante())->buscarPorCodigo($codigo) : null;
+
+        if (!$p) {
+            usleep(400000);   // frena a quien intente probar códigos al azar
+            $_SESSION['entrar_intentos'] = ($_SESSION['entrar_intentos'] ?? 0) + 1;
+            if ($_SESSION['entrar_intentos'] >= 5) {
+                $_SESSION['entrar_bloqueado_hasta'] = time() + 600;
+                $_SESSION['entrar_intentos'] = 0;
+            }
+            $this->regresarConErrores('entrar', ['codigo' => 'Ese código no existe. Revísalo (son 8 caracteres) o pide al organizador que te lo reenvíe.'], ['codigo']);
+        }
+
+        unset($_SESSION['entrar_intentos'], $_SESSION['entrar_bloqueado_hasta']);
+        Participacion::recordar($p);
+        flash('success', '¡Hola de nuevo, ' . explode(' ', $p['nombre'])[0] . '!');
+        redirigir('intercambios/' . $p['intercambio_id']);
+    }
+
     /** POST /intercambios/{id}/salir  — "No soy yo": este navegador olvida al participante */
     public function olvidarDispositivo(string $id): void
     {
         Csrf::verificar();
         Participacion::olvidar((int)$id);
-        flash('info', 'Listo: este navegador ya no recuerda tu participación. Puedes volver a entrar con tu enlace personal.');
+        flash('info', 'Listo: este navegador ya no recuerda tu participación. Puedes volver a entrar con tu código personal o tu enlace.');
         redirigir('/');
     }
 
