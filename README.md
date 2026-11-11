@@ -208,7 +208,19 @@ Ejecuta 50+ pruebas (algoritmo, validaciones y base de datos). El plan manual co
 6. Abre `https://tu-subdominio/prueba-conexion` → debe decir **"Conexión correcta"**.
 7. En el panel → **SSL Certificates** → solicita el certificado gratis para tener `https://`.
 
-### 9.3 Notas del hosting gratuito
+### 9.3 Publicación automática con GitHub Actions (recomendado)
+El archivo `.github/workflows/deploy.yml` sube el sitio a InfinityFree **cada vez que haces Push a `main`**:
+crea `config/config.local.php` con los datos del hosting y copia por FTP todo lo necesario a `htdocs/`
+(no sube `tests/`, `docs/`, `database/` ni el README).
+
+Configuración (una sola vez):
+1. En GitHub, abre tu repositorio → **Settings → Secrets and variables → Actions → New repository secret**.
+2. Nombre: `FTP_PASSWORD` · Valor: la contraseña de tu cuenta de hosting (InfinityFree → *FTP Details* → ícono del ojo).
+3. Pestaña **Actions → Publicar en InfinityFree → Run workflow** (o haz cualquier Push).
+
+Si cambias de cuenta de hosting, actualiza los valores de `env:` al inicio de `deploy.yml`.
+
+### 9.4 Notas del hosting gratuito
 - Un sitio nuevo puede tardar unos minutos (hasta 72 h en casos raros) en verse por la propagación del DNS.
 - No hay envío de correos con `mail()`; las notificaciones de la plataforma sí funcionan porque son internas.
 - Las pruebas de `tests/` se ejecutan en tu computadora, no en el hosting.

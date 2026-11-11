@@ -37,7 +37,7 @@ CREATE TABLE usuarios (
     creado_en      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     actualizado_en DATETIME      NULL ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_usuarios_email (email)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
 -- 2. INTERCAMBIOS: cada evento navideño. admin_id = quien lo creó
@@ -62,7 +62,7 @@ CREATE TABLE intercambios (
     UNIQUE KEY uq_intercambios_codigo (codigo_acceso),
     CONSTRAINT fk_intercambios_admin FOREIGN KEY (admin_id)
         REFERENCES usuarios(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
 -- 3. PARTICIPANTES: relación usuario <-> intercambio con su perfil
@@ -83,7 +83,7 @@ CREATE TABLE participantes (
         REFERENCES intercambios(id) ON DELETE CASCADE,
     CONSTRAINT fk_part_usuario FOREIGN KEY (usuario_id)
         REFERENCES usuarios(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
 -- 4. DESEOS: elementos de la wishlist de cada participante
@@ -99,7 +99,7 @@ CREATE TABLE deseos (
     creado_en        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_deseos_part FOREIGN KEY (participante_id)
         REFERENCES participantes(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
 -- 5. RESTRICCIONES: "dador NO puede regalarle a receptor"
@@ -119,7 +119,7 @@ CREATE TABLE restricciones (
         REFERENCES participantes(id) ON DELETE CASCADE,
     CONSTRAINT fk_res_receptor FOREIGN KEY (receptor_id)
         REFERENCES participantes(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
 -- 6. ASIGNACIONES: resultado del sorteo (¡información privada!)
@@ -142,7 +142,7 @@ CREATE TABLE asignaciones (
         REFERENCES participantes(id) ON DELETE CASCADE,
     CONSTRAINT fk_asig_receptor FOREIGN KEY (receptor_id)
         REFERENCES participantes(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
 -- 7. INVITACIONES: enlaces únicos enviados por el administrador
@@ -157,7 +157,7 @@ CREATE TABLE invitaciones (
     UNIQUE KEY uq_invitacion_token (token),
     CONSTRAINT fk_inv_intercambio FOREIGN KEY (intercambio_id)
         REFERENCES intercambios(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
 -- 8. NOTIFICACIONES: avisos dentro de la plataforma
@@ -176,4 +176,4 @@ CREATE TABLE notificaciones (
         REFERENCES usuarios(id) ON DELETE CASCADE,
     CONSTRAINT fk_notif_intercambio FOREIGN KEY (intercambio_id)
         REFERENCES intercambios(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

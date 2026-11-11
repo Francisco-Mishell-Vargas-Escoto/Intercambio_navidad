@@ -1,0 +1,70 @@
+# Archivo: .github/workflows/deploy.yml
+# Publica el sitio en InfinityFree por FTP cada vez que se sube código a la rama main.
+#
+# Requisito (una sola vez): en GitHub → Settings → Secrets and variables → Actions
+# crea el secreto  FTP_PASSWORD  con la contraseña de tu cuenta de hosting de InfinityFree
+# (es la misma para FTP y para MySQL). Nunca se escribe en el código.
+
+name: Publicar en InfinityFree
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # permite ejecutarlo a mano desde la pestaña Actions
+
+concurrency:
+  group: deploy-infinityfree
+  cancel-in-progress: false
+
+env:
+  FTP_SERVER: ftpupload.net
+  FTP_USUARIO: if0_43408911
+  DB_HOST: sql112.infinityfree.com
+  DB_NOMBRE: if0_43408911_intercambio
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Revisar que exista el secreto FTP_PASSWORD
+        env:
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          if [ -z "$FTP_PASSWORD" ]; then
+            echo "::error::Falta el secreto FTP_PASSWORD (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Crear config/config.local.php con los datos del hosting
+        env:
+          DB_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          php -r '
+            $c  = "<?php\n// Generado automáticamente por GitHub Actions. No lo subas al repositorio.\n";
+            $c .= "define(\"DB_HOST\", "     . var_export(getenv("DB_HOST"), true)   . ");\n";
+            $c .= "define(\"DB_NOMBRE\", "   . var_export(getenv("DB_NOMBRE"), true) . ");\n";
+            $c .= "define(\"DB_USUARIO\", "  . var_export(getenv("FTP_USUARIO"), true) . ");\n";
+            $c .= "define(\"DB_PASSWORD\", " . var_export(getenv("DB_PASS"), true)   . ");\n";
+            $c .= "define(\"MODO_DESARROLLO\", false);\n";
+            file_put_contents("config/config.local.php", $c);
+          '
+          php -l config/config.local.php
+
+      - name: Subir archivos por FTP a htdocs/
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ env.FTP_SERVER }}
+          username: ${{ env.FTP_USUARIO }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: htdocs/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            tests/**
+            docs/**
+            database/**
+            README.md
